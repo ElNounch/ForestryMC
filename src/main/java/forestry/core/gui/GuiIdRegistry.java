@@ -27,7 +27,7 @@ import forestry.apiculture.tiles.TileApiary;
 import forestry.apiculture.tiles.TileBeeHouse;
 import forestry.book.items.ItemForesterBook;
 import forestry.climatology.tiles.TileClimatiser;
-import forestry.climatology.tiles.TileHabitatFormer;
+import forestry.climatology.tiles.TileHabitatformer;
 import forestry.core.items.ItemAlyzer;
 import forestry.core.items.ItemSolderingIron;
 import forestry.core.tiles.TileAnalyzer;
@@ -99,7 +99,7 @@ public class GuiIdRegistry {
 				TileFarm.class,
 
 				//Climatology
-				TileHabitatFormer.class,
+				TileHabitatformer.class,
 				TileClimatiser.class,
 
 				//Sorting Module
@@ -128,7 +128,8 @@ public class GuiIdRegistry {
 				ItemHabitatLocator.class,
 				ItemImprinter.class,
 				ItemLetter.class,
-				ItemSolderingIron.class
+				ItemSolderingIron.class,
+				ItemForesterBook.class
 		));
 
 		registerGuiHandlers(GuiType.Entity, Arrays.asList(

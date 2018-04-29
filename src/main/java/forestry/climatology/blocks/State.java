@@ -20,6 +20,10 @@ public enum State implements IStringSerializable {
 
 	public static final PropertyEnum<State> PROPERTY = PropertyEnum.create("state", State.class);
 
+	public static State fromBool(boolean value) {
+		return value ? ON : OFF;
+	}
+
 	@Override
 	public String getName() {
 		return name().toLowerCase(Locale.ENGLISH);

@@ -8,13 +8,12 @@
  * Various Contributors including, but not limited to:
  * SirSengir (original work), CovertJaguar, Player, Binnie, MysteriousAges
  ******************************************************************************/
-package forestry.climatology.climate;
+package forestry.climatology.climate.source;
 
 import javax.annotation.Nullable;
 
 import net.minecraft.nbt.NBTTagCompound;
 
-import forestry.api.climate.ClimateStateType;
 import forestry.api.climate.ClimateType;
 import forestry.api.climate.IClimateState;
 import forestry.climatology.api.climate.IClimateLogic;
@@ -40,7 +39,7 @@ public abstract class ClimateSource<P extends IClimateSourceProxy> implements IC
 		this.sourceType = sourceType;
 		this.temperatureMode = ClimateSourceMode.NONE;
 		this.humidityMode = ClimateSourceMode.NONE;
-		this.state = ClimateStates.extendedZero();
+		this.state = ClimateStates.ZERO;
 	}
 
 	@Override
@@ -90,9 +89,9 @@ public abstract class ClimateSource<P extends IClimateSourceProxy> implements IC
 
 	@Override
 	public final IClimateState work(IClimateLogic logic, IClimateState previousState, IClimateState targetState, IClimateState currentState, final double sizeModifier) {
-		IClimateState newState = ClimateStates.INSTANCE.create(getState(), ClimateStateType.EXTENDED);
-		IClimateState newChange = ClimateStates.extendedZero();
-		IClimateState defaultState = logic.getHousing().getDefaultClimate();
+		IClimateState newState = ClimateStates.INSTANCE.create(getState(), true);
+		IClimateState newChange = ClimateStates.ZERO;
+		IClimateState defaultState = logic.getHousing().getBiome();
 		ClimateSourceType validType = getWorkType(currentState, targetState);
 		ClimateSourceType oppositeType = getOppositeWorkType(currentState, defaultState);
 		beforeWork();
@@ -111,7 +110,7 @@ public abstract class ClimateSource<P extends IClimateSourceProxy> implements IC
 			}
 			//If the state is not already zero, remove one change state from the state.
 			newChange = getChange(oppositeType, defaultState, currentState);
-			newChange = ClimateStates.INSTANCE.create(-newChange.getTemperature(), -newChange.getHumidity(), ClimateStateType.EXTENDED);
+			newChange = ClimateStates.INSTANCE.create(-newChange.getTemperature(), -newChange.getHumidity());
 		} else if (validType != null) {
 			newChange = getChange(validType, targetState, previousState);
 			IClimateState changedState = newState.add(newChange.scale(1 / sizeModifier));
@@ -119,7 +118,7 @@ public abstract class ClimateSource<P extends IClimateSourceProxy> implements IC
 			//Test if the owner could work with the changed state. If he can remove the resources for the changed state, if not only remove the resources for the old state.
 			removeResources(couldWork ? changedState : newState, oppositeType);
 			if (!couldWork) {
-				newChange = ClimateStates.extendedZero();
+				newChange = ClimateStates.ZERO;
 			}
 		} else if (oppositeType != null) {
 			//Remove the resources if the owner has enough resources and the state is not the default state.
@@ -127,7 +126,7 @@ public abstract class ClimateSource<P extends IClimateSourceProxy> implements IC
 		}
 		newState = newState.add(newChange.scale(1 / sizeModifier));
 		if (ClimateStates.isZero(newState) || ClimateStates.isNearZero(newState)) {
-			newState = ClimateStates.extendedZero();
+			newState = ClimateStates.ZERO;
 		}
 		setState(newState);
 		return newChange;
@@ -198,7 +197,7 @@ public abstract class ClimateSource<P extends IClimateSourceProxy> implements IC
 		if (sourceData.hasNoTags()) {
 			return;
 		}
-		state = ClimateStates.INSTANCE.create(sourceData, ClimateStateType.EXTENDED);
+		state = ClimateStates.INSTANCE.create(sourceData);
 	}
 
 }

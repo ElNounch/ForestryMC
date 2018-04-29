@@ -98,8 +98,8 @@ public class WidgetClimateBar extends Widget {
 		IClimateState targetedState = housing.getTargetedState();
 		IClimateState state = housing.getState();
 		ToolTip toolTip = new ToolTip();
-		toolTip.add(Translator.translateToLocalFormatted("for.gui.habitat_former.climate.target", VALUE_FORMAT.format(targetedState.get(type))));
-		toolTip.add(Translator.translateToLocalFormatted("for.gui.habitat_former.climate.value", VALUE_FORMAT.format(state.get(type))));
+		toolTip.add(Translator.translateToLocalFormatted("for.gui.habitatformer.climate.target", VALUE_FORMAT.format(targetedState.get(type))));
+		toolTip.add(Translator.translateToLocalFormatted("for.gui.habitatformer.climate.value", VALUE_FORMAT.format(state.get(type))));
 		return toolTip;
 	}
 }

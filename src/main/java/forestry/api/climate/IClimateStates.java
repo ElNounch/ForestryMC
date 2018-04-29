@@ -11,15 +11,28 @@ public interface IClimateStates {
 
 	IClimateState create(NBTTagCompound compound);
 
-	IClimateState create(NBTTagCompound compound, ClimateStateType type);
+	IClimateState create(NBTTagCompound compound, boolean mutable);
 
-	IClimateState create(float temperature, float humidity, ClimateStateType type);
+	IClimateState create(float temperature, float humidity);
 
-	IClimateState create(IClimateState climateState, ClimateStateType type);
+	IClimateState create(float temperature, float humidity, boolean mutable);
+
+	IClimateState create(IClimateState climateState);
+
+	IClimateState create(IClimateState climateState, boolean mutable);
+
+	/**
+	 * Checks if the given state is valid and returns the absent state if the given state is not valid.
+	 */
+	IClimateState checkState(IClimateState climateState);
 
 	IClimateState absent();
 
 	IClimateState min();
 
 	IClimateState max();
+
+	IClimateState zero();
+
+	IClimateState mutableZero();
 }

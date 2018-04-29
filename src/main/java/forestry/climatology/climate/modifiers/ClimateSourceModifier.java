@@ -19,7 +19,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import forestry.api.climate.ClimateStateType;
 import forestry.api.climate.ClimateType;
 import forestry.api.climate.IClimateState;
 import forestry.climatology.api.climate.IClimateLogic;
@@ -59,7 +58,7 @@ public class ClimateSourceModifier implements IClimateModifier {
 			return newState;
 		}
 		IClimateState target = getTargetOrBound(previousState, logic.getBoundaryDown(), logic.getBoundaryUp(), targetedState);
-		IClimateState changeState = ClimateStates.extendedZero();
+		IClimateState changeState = ClimateStates.ZERO;
 
 		for (IClimateSource source : logic.getClimateSources()) {
 			newState = newState.add(source.getState());
@@ -77,9 +76,9 @@ public class ClimateSourceModifier implements IClimateModifier {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void addInformation(IClimateLogic container, NBTTagCompound nbtData, ClimateType type, List<String> lines) {
-		IClimateState rangeDown = ClimateStates.INSTANCE.create(nbtData.getCompoundTag(RANGE_DOWN_NBT_KEY), ClimateStateType.DEFAULT);
-		IClimateState rangeUp = ClimateStates.INSTANCE.create(nbtData.getCompoundTag(RANGE_UP_NBT_KEY), ClimateStateType.DEFAULT);
-		IClimateState change = ClimateStates.INSTANCE.create(nbtData.getCompoundTag(CHANGE_NBT_KEY), ClimateStateType.EXTENDED);
+		IClimateState rangeDown = ClimateStates.INSTANCE.create(nbtData.getCompoundTag(RANGE_DOWN_NBT_KEY));
+		IClimateState rangeUp = ClimateStates.INSTANCE.create(nbtData.getCompoundTag(RANGE_UP_NBT_KEY));
+		IClimateState change = ClimateStates.INSTANCE.create(nbtData.getCompoundTag(CHANGE_NBT_KEY));
 		if (type == ClimateType.HUMIDITY) {
 			lines.add(Translator.translateToLocalFormatted("for.gui.modifier.sources.range.up", StringUtil.floatAsPercent(rangeUp.getHumidity())));
 			lines.add(Translator.translateToLocalFormatted("for.gui.modifier.sources.range.down", StringUtil.floatAsPercent(rangeDown.getHumidity())));

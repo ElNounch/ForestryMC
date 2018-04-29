@@ -8,7 +8,7 @@
  * Various Contributors including, but not limited to:
  * SirSengir (original work), CovertJaguar, Player, Binnie, MysteriousAges
  ******************************************************************************/
-package forestry.climatology.climate;
+package forestry.climatology.climate.source;
 
 import forestry.api.climate.ClimateType;
 import forestry.api.climate.IClimateState;

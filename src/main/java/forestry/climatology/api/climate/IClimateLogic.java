@@ -7,6 +7,7 @@ package forestry.climatology.api.climate;
 
 import java.util.List;
 
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import net.minecraftforge.fml.relauncher.Side;
@@ -50,5 +51,11 @@ public interface IClimateLogic extends INbtReadable, INbtWritable, IClimateSourc
 	default World getWorldObj() {
 		return getHousing().getWorldObj();
 	}
+
+	boolean isInRange(BlockPos pos);
+
+	boolean isInvalid();
+
+	double getRange();
 
 }

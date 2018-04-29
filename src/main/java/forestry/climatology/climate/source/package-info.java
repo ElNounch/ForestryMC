@@ -8,19 +8,13 @@
  * Various Contributors including, but not limited to:
  * SirSengir (original work), CovertJaguar, Player, Binnie, MysteriousAges
  ******************************************************************************/
-package forestry.climatology.climate;
+@ParametersAreNonnullByDefault
+@FieldsAreNonnullByDefault
+@MethodsReturnNonnullByDefault
+package forestry.climatology.climate.source;
 
-public enum ClimateSourceMode {
-	POSITIVE(1), NEGATIVE(0), NONE(2);
+import javax.annotation.ParametersAreNonnullByDefault;
 
-	private int opposite;
+import mcp.MethodsReturnNonnullByDefault;
 
-	ClimateSourceMode(int opposite) {
-		this.opposite = opposite;
-	}
-
-	public ClimateSourceMode getOpposite() {
-		return values()[opposite];
-	}
-
-}
+import forestry.core.utils.FieldsAreNonnullByDefault;

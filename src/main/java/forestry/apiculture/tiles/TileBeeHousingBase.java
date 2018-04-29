@@ -10,15 +10,31 @@
  ******************************************************************************/
 package forestry.apiculture.tiles;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
+
 import com.mojang.authlib.GameProfile;
+
+import net.minecraftforge.common.capabilities.Capability;
+
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
 import forestry.api.apiculture.BeeManager;
 import forestry.api.apiculture.IBeeHousing;
 import forestry.api.apiculture.IBeekeepingLogic;
+import forestry.api.climate.IClimateState;
 import forestry.api.core.EnumHumidity;
 import forestry.api.core.EnumTemperature;
 import forestry.apiculture.gui.IGuiBeeHousingDelegate;
+import forestry.climatology.api.climate.ClimatologyCapabilities;
+import forestry.climatology.api.climate.prefab.ClimateListener;
 import forestry.core.network.IStreamableGui;
 import forestry.core.network.PacketBufferForestry;
 import forestry.core.owner.IOwnedTile;
@@ -28,17 +44,12 @@ import forestry.core.render.ParticleRender;
 import forestry.core.tiles.IClimatised;
 import forestry.core.tiles.TileBase;
 import forestry.core.utils.ClimateUtil;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 public abstract class TileBeeHousingBase extends TileBase implements IBeeHousing, IOwnedTile, IClimatised, IGuiBeeHousingDelegate, IStreamableGui {
 	private final String hintKey;
 	private final OwnerHandler ownerHandler = new OwnerHandler();
 	private final IBeekeepingLogic beeLogic;
+	protected final ClimateListener climateListener;
 
 	// CLIENT
 	private int breedingProgressPercent = 0;
@@ -46,6 +57,8 @@ public abstract class TileBeeHousingBase extends TileBase implements IBeeHousing
 	protected TileBeeHousingBase(String hintKey) {
 		this.hintKey = hintKey;
 		this.beeLogic = BeeManager.beeRoot.createBeekeepingLogic(this);
+
+		climateListener = new ClimateListener(this);
 	}
 
 	@Override
@@ -108,12 +121,35 @@ public abstract class TileBeeHousingBase extends TileBase implements IBeeHousing
 
 	@Override
 	public float getExactTemperature() {
+		IClimateState personalState = climateListener.getState();
+		if(personalState.isPresent()){
+			return personalState.getTemperature();
+		}
 		return ClimateUtil.getTemperature(world, getPos());
 	}
 
 	@Override
 	public float getExactHumidity() {
+		IClimateState personalState = climateListener.getState();
+		if(personalState.isPresent()){
+			return personalState.getHumidity();
+		}
 		return ClimateUtil.getHumidity(world, getPos());
+	}
+
+	/* ClimateListener */
+	@Override
+	public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
+		return capability == ClimatologyCapabilities.CLIMATE_LISTENER || super.hasCapability(capability, facing);
+	}
+
+	@Nullable
+	@Override
+	public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
+		if(capability == ClimatologyCapabilities.CLIMATE_LISTENER){
+			return ClimatologyCapabilities.CLIMATE_LISTENER.cast(climateListener);
+		}
+		return super.getCapability(capability, facing);
 	}
 
 	/* UPDATING */
@@ -127,6 +163,7 @@ public abstract class TileBeeHousingBase extends TileBase implements IBeeHousing
 				doPollenFX(world, getPos().getX(), getPos().getY(), getPos().getZ());
 			}
 		}
+		climateListener.updateClient();
 	}
 
 	@SideOnly(Side.CLIENT)

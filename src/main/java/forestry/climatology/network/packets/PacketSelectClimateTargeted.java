@@ -16,7 +16,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.BlockPos;
 
 import forestry.api.climate.IClimateState;
-import forestry.api.climatology.IHabitatFormerHousing;
+import forestry.api.climatology.IHabitatformerHousing;
 import forestry.climatology.api.climate.IClimateLogic;
 import forestry.core.network.ForestryPacket;
 import forestry.core.network.IForestryPacketHandlerServer;
@@ -51,7 +51,7 @@ public class PacketSelectClimateTargeted extends ForestryPacket implements IFore
 			BlockPos pos = data.readBlockPos();
 			IClimateState climateState = data.readClimateState();
 
-			IHabitatFormerHousing housing = TileUtil.getTile(player.world, pos, IHabitatFormerHousing.class);
+			IHabitatformerHousing housing = TileUtil.getTile(player.world, pos, IHabitatformerHousing.class);
 			if (housing != null) {
 				IClimateLogic logic = housing.getLogic();
 				logic.setTargetedState(climateState);

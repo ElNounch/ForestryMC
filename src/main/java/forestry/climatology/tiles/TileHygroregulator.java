@@ -17,7 +17,7 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import forestry.climatology.climate.ClimateSourceHygroregulator;
+import forestry.climatology.climate.source.ClimateSourceHygroregulator;
 import forestry.climatology.gui.ContainerHygroregulator;
 import forestry.climatology.gui.GuiHygroregulator;
 import forestry.climatology.inventory.InventoryHygroregulator;

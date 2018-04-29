@@ -11,12 +11,14 @@
 package forestry.climatology.blocks;
 
 import javax.annotation.Nullable;
+import java.util.Random;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.Item;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
 
 import net.minecraftforge.client.model.ModelLoader;
 
@@ -25,9 +27,12 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import forestry.api.core.IModelManager;
 import forestry.climatology.ModuleClimatology;
+import forestry.climatology.tiles.TileHabitatformer;
 import forestry.core.blocks.BlockBase;
 import forestry.core.blocks.IColoredBlock;
 import forestry.core.render.MachineStateMapper;
+import forestry.core.render.ParticleRender;
+import forestry.core.tiles.TileUtil;
 
 public class BlockHabitatformer extends BlockBase<BlockTypeClimatology> implements IColoredBlock {
 	public BlockHabitatformer() {
@@ -48,6 +53,15 @@ public class BlockHabitatformer extends BlockBase<BlockTypeClimatology> implemen
 	@Override
 	public void registerModel(Item item, IModelManager manager) {
 		manager.registerItemModel(item, 0, "habitatformer/base");
+	}
+
+	@SideOnly(Side.CLIENT)
+	@Override
+	public void randomDisplayTick(IBlockState stateIn, World worldIn, BlockPos pos, Random rand) {
+		TileHabitatformer former = TileUtil.getTile(worldIn, pos, TileHabitatformer.class);
+		if(former != null) {
+			ParticleRender.addClimateParticles(worldIn, pos, stateIn, rand, former.getLogic().getState());
+		}
 	}
 
 	@SideOnly(Side.CLIENT)

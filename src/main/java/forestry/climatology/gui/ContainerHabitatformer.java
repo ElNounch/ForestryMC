@@ -12,13 +12,13 @@ package forestry.climatology.gui;
 
 import net.minecraft.entity.player.InventoryPlayer;
 
-import forestry.climatology.tiles.TileHabitatFormer;
+import forestry.climatology.tiles.TileHabitatformer;
 import forestry.core.gui.ContainerSocketed;
 import forestry.core.network.packets.PacketGuiUpdate;
 
-public class ContainerHabitatformer extends ContainerSocketed<TileHabitatFormer> {
+public class ContainerHabitatformer extends ContainerSocketed<TileHabitatformer> {
 
-	public ContainerHabitatformer(InventoryPlayer playerInventory, TileHabitatFormer tile) {
+	public ContainerHabitatformer(InventoryPlayer playerInventory, TileHabitatformer tile) {
 		super(tile, playerInventory, 8, 84);
 	}
 

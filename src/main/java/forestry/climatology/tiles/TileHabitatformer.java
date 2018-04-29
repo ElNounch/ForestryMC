@@ -11,16 +11,19 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.chunk.Chunk;
 
 import forestry.api.circuits.ChipsetManager;
 import forestry.api.circuits.CircuitSocketType;
 import forestry.api.circuits.ICircuitBoard;
 import forestry.api.circuits.ICircuitSocketType;
 import forestry.api.climate.IClimateState;
-import forestry.api.climatology.IHabitatFormerHousing;
+import forestry.api.climatology.IHabitatformerHousing;
 import forestry.api.core.EnumHumidity;
 import forestry.api.core.EnumTemperature;
 import forestry.climatology.ClimateSystem;
+import forestry.climatology.api.climate.ClimatologyCapabilities;
+import forestry.climatology.api.climate.IClimateHolder;
 import forestry.climatology.api.climate.IClimateLogic;
 import forestry.climatology.climate.ClimateLogic;
 import forestry.climatology.gui.ContainerHabitatformer;
@@ -33,36 +36,37 @@ import forestry.core.network.PacketBufferForestry;
 import forestry.core.tiles.IClimatised;
 import forestry.core.tiles.TilePowered;
 
-public class TileHabitatFormer extends TilePowered implements IHabitatFormerHousing, IClimatised, ISocketable {
+public class TileHabitatformer extends TilePowered implements IHabitatformerHousing, IClimatised, ISocketable {
 	private static final String CONTAINER_NBT_KEY = "Container";
 
 	private final AdjacentNodeCache nodeCache;
 	private final InventoryAdapter sockets = new InventoryAdapter(1, "sockets");
 
-	private ClimateLogic logic;
-	private IClimateState defaultState;
+	private final ClimateLogic logic;
+	private IClimateState biomeState;
 	private long[] chunks;
 	private float radius;
 
-	public TileHabitatFormer() {
+	public TileHabitatformer() {
 		super(800, 10000);
-		this.nodeCache = new AdjacentNodeCache(getTileCache());
-		this.defaultState = ClimateStates.INSTANCE.absent();
+		this.biomeState = ClimateStates.INSTANCE.absent();
 		this.logic = new ClimateLogic(this);
+		this.nodeCache = new AdjacentNodeCache(getTileCache(), logic);
 		this.chunks = new long[0];
 		this.radius = 2.9F;
 	}
 
 	@Override
 	protected void updateServerSide() {
-		if (!defaultState.isPresent()) {
-			defaultState = ClimateManager.getInstance().getBiomeState(world, pos);
+		if (!biomeState.isPresent()) {
+			biomeState = ClimateManager.getInstance().getBiomeState(world, pos);
 			if (!logic.getTargetedState().isPresent()) {
-				logic.setState(defaultState.copy());
-				logic.setTargetedState(defaultState);
+				logic.setState(biomeState.copy());
+				logic.setTargetedState(biomeState);
 			}
 			addChunks();
 		}
+		nodeCache.checkChanged();
 		logic.updateClimate();
 		super.updateServerSide();
 	}
@@ -82,7 +86,7 @@ public class TileHabitatFormer extends TilePowered implements IHabitatFormerHous
 	@Override
 	public void validate() {
 		super.validate();
-		addChunks();
+		//addChunks();
 	}
 
 	private void addChunks() {
@@ -96,6 +100,13 @@ public class TileHabitatFormer extends TilePowered implements IHabitatFormerHous
 				if (current.distance(center) <= radius + 0.01) {
 					if (current.distance(center) < radius - 0.5f) {
 						ClimateSystem.INSTANCE.addLogic(current.toChunkPos(), logic);
+						Chunk chunk = world.getChunkFromChunkCoords((int)current.x, (int)current.z);
+						if(chunk != null){
+							IClimateHolder holder = chunk.getCapability(ClimatologyCapabilities.CLIMATE_HOLDER, null);
+							if(holder != null) {
+								holder.addTransformer(this);
+							}
+						}
 						chunkSet.add(current.toChunkPos());
 					}
 				}
@@ -110,6 +121,15 @@ public class TileHabitatFormer extends TilePowered implements IHabitatFormerHous
 	private void removeChunks() {
 		for (long chungPos : chunks) {
 			ClimateSystem.INSTANCE.removeLogic(chungPos, logic);
+			int x = (int)(chungPos & 4294967295L);
+			int y = (int)((chungPos >> 32) & 4294967295L);
+			Chunk chunk = world.getChunkFromChunkCoords(x, y);
+			if(chunk != null){
+				IClimateHolder holder = chunk.getCapability(ClimatologyCapabilities.CLIMATE_HOLDER, null);
+				if(holder != null) {
+					holder.removeTransformer(this);
+				}
+			}
 		}
 		chunks = new long[0];
 		markChunksForRenderUpdate();
@@ -166,14 +186,24 @@ public class TileHabitatFormer extends TilePowered implements IHabitatFormerHous
 		return logic.getState().getHumidity();
 	}
 
+	@Override
+	public int getRange() {
+		return (int)(radius * 16);
+	}
+
 	/* Methods - Implement IGreenhouseHousing */
 	@Override
 	public void onUpdateClimate() {
 	}
 
 	@Override
-	public IClimateState getDefaultClimate() {
-		return defaultState;
+	public IClimateState getBiome() {
+		return biomeState;
+	}
+
+	@Override
+	public boolean isTileInvalid() {
+		return isInvalid();
 	}
 
 	@Override

@@ -15,7 +15,7 @@ import java.io.IOException;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 
-import forestry.api.climatology.IHabitatFormerHousing;
+import forestry.api.climatology.IHabitatformerHousing;
 import forestry.climatology.api.climate.IClimateLogic;
 import forestry.climatology.climate.ClimateLogic;
 import forestry.core.network.ForestryPacket;
@@ -51,7 +51,7 @@ public class PacketUpdateClimate extends ForestryPacket implements IForestryPack
 		@Override
 		public void onPacketData(PacketBufferForestry data, EntityPlayer player) throws IOException {
 			BlockPos position = data.readBlockPos();
-			IHabitatFormerHousing housing = TileUtil.getTile(player.world, position, IHabitatFormerHousing.class);
+			IHabitatformerHousing housing = TileUtil.getTile(player.world, position, IHabitatformerHousing.class);
 			if(housing == null){
 				return;
 			}

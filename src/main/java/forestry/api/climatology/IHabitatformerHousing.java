@@ -5,12 +5,14 @@
  ******************************************************************************/
 package forestry.api.climatology;
 
+import forestry.api.climate.IClimateState;
 import forestry.api.core.EnumHumidity;
 import forestry.api.core.EnumTemperature;
 import forestry.api.core.IErrorLogicSource;
 import forestry.climatology.api.climate.IClimateLogic;
+import forestry.climatology.api.climate.IClimateTransformer;
 
-public interface IHabitatFormerHousing extends IErrorLogicSource, IClimateHousing{
+public interface IHabitatformerHousing extends IErrorLogicSource, IClimateHousing, IClimateTransformer{
 	
 	/**
 	 * @return The current tempreture as an enum.
@@ -33,4 +35,12 @@ public interface IHabitatFormerHousing extends IErrorLogicSource, IClimateHousin
 	float getExactHumidity();
 
 	IClimateLogic getLogic();
+
+	default IClimateState getTarget(){
+		return getLogic().getTargetedState();
+	}
+
+	default IClimateState getCurrent(){
+		return getLogic().getState();
+	}
 }

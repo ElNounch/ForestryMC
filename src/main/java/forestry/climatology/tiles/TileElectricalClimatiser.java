@@ -11,9 +11,9 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import forestry.climatology.climate.ClimateSource;
-import forestry.climatology.climate.ClimateSourceElectrical;
-import forestry.climatology.climate.ClimateSourceType;
+import forestry.climatology.climate.source.ClimateSource;
+import forestry.climatology.climate.source.ClimateSourceElectrical;
+import forestry.climatology.climate.source.ClimateSourceType;
 import forestry.core.network.IStreamableGui;
 import forestry.core.network.PacketBufferForestry;
 import forestry.energy.EnergyManager;

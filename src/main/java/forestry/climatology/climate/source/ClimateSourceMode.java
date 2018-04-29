@@ -8,25 +8,19 @@
  * Various Contributors including, but not limited to:
  * SirSengir (original work), CovertJaguar, Player, Binnie, MysteriousAges
  ******************************************************************************/
-package forestry.climatology.proxy;
+package forestry.climatology.climate.source;
 
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+public enum ClimateSourceMode {
+	POSITIVE(1), NEGATIVE(0), NONE(2);
 
-@SideOnly(Side.CLIENT)
-public class ProxyClimatologyClient extends ProxyClimatology {
+	private int opposite;
 
-	@Override
-	public void initializeModels() {
+	ClimateSourceMode(int opposite) {
+		this.opposite = opposite;
 	}
 
-	@Override
-	public void preInti() {
-	}
-
-	@Override
-	public void inti() {
-
+	public ClimateSourceMode getOpposite() {
+		return values()[opposite];
 	}
 
 }

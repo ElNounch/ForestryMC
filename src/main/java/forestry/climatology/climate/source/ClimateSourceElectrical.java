@@ -8,7 +8,7 @@
  * Various Contributors including, but not limited to:
  * SirSengir (original work), CovertJaguar, Player, Binnie, MysteriousAges
  ******************************************************************************/
-package forestry.climatology.climate;
+package forestry.climatology.climate.source;
 
 import javax.annotation.Nullable;
 
@@ -85,7 +85,7 @@ public class ClimateSourceElectrical extends ClimateSourceCircuitable<TileElectr
 		if (type.canChangeTemperature()) {
 			temperature += getChange(ClimateType.TEMPERATURE);
 		}
-		return ClimateStates.extendedOf(temperature, humidity);
+		return ClimateStates.mutableOf(temperature, humidity);
 	}
 
 }

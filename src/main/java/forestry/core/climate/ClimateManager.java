@@ -17,7 +17,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
-import forestry.api.climate.IClimateInfo;
 import forestry.api.climate.IClimateManager;
 import forestry.api.climate.IClimateProvider;
 import forestry.api.climate.IClimateState;
@@ -38,16 +37,6 @@ public class ClimateManager implements IClimateManager {
 	
 	public static ClimateManager getInstance(){
 		return INSTANCE;
-	}
-
-	@Override
-	public IClimateInfo createInfo(float temperature, float humidity) {
-		return new ClimateInfo(temperature, humidity);
-	}
-
-	@Override
-	public IClimateInfo getInfo(World world, BlockPos pos) {
-		return new ClimateInfo(getBiomeState(world, pos));
 	}
 
 	@Override

@@ -1750,13 +1750,6 @@ for.config.tweaks.cultivation.ring_size.comment=Sets the size of the inner ring 
 for.config.tweaks.capsule=Capsules
 for.config.tweaks.capsule.comment=Enables the function that cans and capsules can pick up fluids from the world.
 
-for.config.tweaks.greenhouse.range=Greenhouse Range
-for.config.tweaks.greenhouse.range.comment=Set the range divisor of the climatiser of the greenhouse.
-for.config.tweaks.greenhouse.size=Greenhouse Size
-for.config.tweaks.greenhouse.size.comment=Set the size multiplier of the climated blocks.
-for.config.tweaks.greenhouse.energy=Greenhouse Energy Modifier
-for.config.tweaks.greenhouse.energy.comment=Modifies the energy that is used by the greenhouse climatisers.
-
 for.config.tweaks.book.spawn=Forester's Manual
 for.config.tweaks.book.spawn.comment=Players who enter the world for the first time get a Forester's Manual.
 

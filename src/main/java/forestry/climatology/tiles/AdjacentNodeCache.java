@@ -1,37 +1,27 @@
 package forestry.climatology.tiles;
 
-import javax.annotation.Nullable;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 
 import forestry.climatology.api.climate.source.IClimateSource;
 import forestry.climatology.api.climate.source.IClimateSourceProxy;
+import forestry.climatology.climate.ClimateLogic;
+import forestry.core.blocks.BlockBase;
 import forestry.core.tiles.AdjacentTileCache;
 
 public class AdjacentNodeCache implements AdjacentTileCache.ICacheListener {
 	private final AdjacentTileCache cache;
-	private final List<IClimateSource> nodes = new LinkedList<>();
 	private final IClimateSource[] sides = new IClimateSource[6];
+	private final ClimateLogic logic;
 	private boolean changed = true;
 
-	public AdjacentNodeCache(AdjacentTileCache cache) {
+	public AdjacentNodeCache(AdjacentTileCache cache, ClimateLogic logic) {
 		this.cache = cache;
-	}
-
-	@Nullable
-	public IClimateSource getAdjacentNode(EnumFacing side) {
-		checkChanged();
-		return sides[side.ordinal()];
-	}
-
-	public Collection<IClimateSource> getAdjacentNodes() {
-		checkChanged();
-		return nodes;
+		this.logic = logic;
+		cache.addListener(this);
 	}
 
 	@Override
@@ -41,21 +31,29 @@ public class AdjacentNodeCache implements AdjacentTileCache.ICacheListener {
 
 	@Override
 	public void purge() {
-		nodes.clear();
+		for (IClimateSource source : sides) {
+			logic.onRemoveSource(source);
+		}
 		Arrays.fill(sides, null);
 	}
 
-	private void checkChanged() {
+	public void checkChanged() {
 		cache.refresh();
 		if (changed) {
 			changed = false;
 			purge();
-			for (EnumFacing side : EnumFacing.values()) {
+			TileEntity cacheSource = cache.getSource();
+			IBlockState state = cacheSource.getWorld().getBlockState(cacheSource.getPos());
+			EnumFacing facing = state.getValue(BlockBase.FACING);
+			for (EnumFacing side : EnumFacing.HORIZONTALS) {
+				if (side == facing) {
+					continue;
+				}
 				TileEntity tile = cache.getTileOnSide(side);
 				if (tile instanceof IClimateSourceProxy) {
-					IClimateSource inv = ((IClimateSourceProxy) tile).getNode();
-					sides[side.ordinal()] = inv;
-					nodes.add(inv);
+					IClimateSource source = ((IClimateSourceProxy) tile).getNode();
+					sides[side.ordinal()] = source;
+					logic.onAddSource(source);
 				}
 			}
 		}

@@ -20,7 +20,7 @@ import net.minecraft.nbt.NBTTagCompound;
 
 import forestry.climatology.api.climate.source.IClimateSourceProxy;
 import forestry.climatology.blocks.BlockClimatiser;
-import forestry.climatology.climate.ClimateSource;
+import forestry.climatology.climate.source.ClimateSource;
 import forestry.climatology.gui.ContainerHabitatformer;
 import forestry.climatology.gui.GuiHabitatformer;
 import forestry.core.blocks.BlockBase;
@@ -65,7 +65,7 @@ public abstract class TileClimatiser<P extends TileClimatiser> extends TileBase 
 	@Nullable
 	@Override
 	public GuiContainer getGui(EntityPlayer player, int data) {
-		TileHabitatFormer former = getFormer();
+		TileHabitatformer former = getFormer();
 		if (former == null) {
 			return null;
 		}
@@ -75,7 +75,7 @@ public abstract class TileClimatiser<P extends TileClimatiser> extends TileBase 
 	@Nullable
 	@Override
 	public Container getContainer(EntityPlayer player, int data) {
-		TileHabitatFormer former = getFormer();
+		TileHabitatformer former = getFormer();
 		if (former == null) {
 			return null;
 		}
@@ -83,12 +83,12 @@ public abstract class TileClimatiser<P extends TileClimatiser> extends TileBase 
 	}
 
 	@Nullable
-	private TileHabitatFormer getFormer() {
+	public TileHabitatformer getFormer() {
 		IBlockState blockState = world.getBlockState(pos);
 		if (!(blockState.getBlock() instanceof BlockClimatiser)) {
 			return null;
 		}
-		return TileUtil.getTile(world, pos.offset(blockState.getValue(BlockBase.FACING).getOpposite()), TileHabitatFormer.class);
+		return TileUtil.getTile(world, pos.offset(blockState.getValue(BlockBase.FACING).getOpposite()), TileHabitatformer.class);
 	}
 
 	@Override

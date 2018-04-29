@@ -12,7 +12,6 @@ package forestry.core.climate;
 
 import net.minecraft.nbt.NBTTagCompound;
 
-import forestry.api.climate.ClimateStateType;
 import forestry.api.climate.IClimateState;
 import forestry.api.climate.IClimateStates;
 import forestry.climatology.climate.modifiers.ClimateSourceModifier;
@@ -25,20 +24,16 @@ public final class ClimateStates implements IClimateStates {
 	private ClimateStates() {
 	}
 
-	public static IClimateState of(float temperature, float humidity, ClimateStateType type) {
-		return INSTANCE.create(temperature, humidity, type);
+	public static IClimateState of(float temperature, float humidity, boolean mutable) {
+		return INSTANCE.create(temperature, humidity, mutable);
 	}
 
 	public static IClimateState of(float temperature, float humidity) {
-		return INSTANCE.create(temperature, humidity, ClimateStateType.DEFAULT);
+		return INSTANCE.create(temperature, humidity, false);
 	}
 
-	public static IClimateState extendedOf(float temperature, float humidity) {
-		return INSTANCE.create(temperature, humidity, ClimateStateType.EXTENDED);
-	}
-
-	public static IClimateState extendedZero() {
-		return INSTANCE.create(ZERO, ClimateStateType.EXTENDED);
+	public static IClimateState mutableOf(float temperature, float humidity) {
+		return INSTANCE.create(temperature, humidity, true);
 	}
 
 	public static boolean isNearTarget(IClimateState state, IClimateState target) {
@@ -57,37 +52,62 @@ public final class ClimateStates implements IClimateStates {
 	}
 
 	@Override
-	public IClimateState create(IClimateState climateState, ClimateStateType type) {
-		IClimateState state = new ClimateState(climateState, type);
-		if (!state.isPresent()) {
-			return absent();
-		}
-		return state;
+	public IClimateState create(float temperature, float humidity) {
+		return create(temperature, humidity, false);
 	}
 
 	@Override
-	public IClimateState create(float temperature, float humidity, ClimateStateType type) {
-		IClimateState state = new ClimateState(temperature, humidity, type);
-		if (!state.isPresent()) {
-			return absent();
-		}
-		return state;
+	public IClimateState create(IClimateState climateState) {
+		return create(climateState, false);
 	}
 
 	@Override
-	public IClimateState create(NBTTagCompound compound, ClimateStateType type) {
-		if(compound.getBoolean(ClimateState.ABSENT_NBT_KEY)){
+	public IClimateState create(IClimateState climateState, boolean mutable) {
+		IClimateState state;
+		if(mutable){
+			state = new MutableClimateState(climateState);
+		}else {
+			state = new ImmutableClimateState(climateState);
+		}
+		return checkState(state);
+	}
+
+	@Override
+	public IClimateState create(float temperature, float humidity, boolean mutable) {
+		IClimateState state;
+		if(mutable){
+			state = new MutableClimateState(temperature, humidity);
+		}else {
+			state = new ImmutableClimateState(temperature, humidity);
+		}
+		return checkState(state);
+	}
+
+	@Override
+	public IClimateState create(NBTTagCompound compound, boolean mutable) {
+		if(compound.getBoolean(ImmutableClimateState.ABSENT_NBT_KEY)){
 			return AbsentClimateState.INSTANCE;
 		}
-		return new ClimateState(compound, type);
+		IClimateState state;
+		if(mutable){
+			state = new MutableClimateState(compound);
+		}else {
+			state = new ImmutableClimateState(compound);
+		}
+		return checkState(state);
 	}
 
 	@Override
 	public IClimateState create(NBTTagCompound compound) {
-		if(compound.getBoolean(ClimateState.ABSENT_NBT_KEY)){
+		if(compound.getBoolean(ImmutableClimateState.ABSENT_NBT_KEY)){
 			return AbsentClimateState.INSTANCE;
 		}
-		return new ClimateState(compound);
+		return create(compound, compound.getBoolean(ImmutableClimateState.MUTABLE_NBT_KEY));
+	}
+
+	@Override
+	public IClimateState checkState(IClimateState climateState) {
+		return !climateState.isPresent() ? absent() : climateState;
 	}
 
 	@Override
@@ -97,11 +117,21 @@ public final class ClimateStates implements IClimateStates {
 
 	@Override
 	public IClimateState min() {
-		return ClimateState.MIN;
+		return ImmutableClimateState.MIN;
 	}
 
 	@Override
 	public IClimateState max() {
-		return ClimateState.MAX;
+		return ImmutableClimateState.MAX;
+	}
+
+	@Override
+	public IClimateState zero() {
+		return ZERO;
+	}
+
+	@Override
+	public IClimateState mutableZero() {
+		return create(0.0F, 0.0F, true);
 	}
 }

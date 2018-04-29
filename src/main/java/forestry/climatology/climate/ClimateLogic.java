@@ -22,7 +22,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import forestry.api.climate.ClimateStateType;
 import forestry.api.climate.ClimateType;
 import forestry.api.climate.IClimateState;
 import forestry.api.climatology.IClimateHousing;
@@ -53,12 +52,13 @@ public class ClimateLogic implements IClimateLogic, IStreamable {
 	protected int area;
 	private NBTTagCompound modifierData;
 	private TickHelper tickHelper;
+	private double range;
 
 	public ClimateLogic(IClimateHousing housing) {
 		this.housing = housing;
 		this.sources = new HashSet<>();
 		this.delay = 20;
-		this.state = housing.getDefaultClimate().copy();
+		this.state = housing.getBiome().copy();
 		this.modifierData = new NBTTagCompound();
 		this.boundaryUp = ClimateStates.INSTANCE.min();
 		this.boundaryDown = ClimateStates.INSTANCE.min();
@@ -74,12 +74,14 @@ public class ClimateLogic implements IClimateLogic, IStreamable {
 
 	@Override
 	public void updateClimate() {
+		tickHelper.onTick();
 		if (tickHelper.updateOnInterval(delay)) {
-			IClimateState lastState = state.copy(ClimateStateType.DEFAULT);
-			state = housing.getDefaultClimate().copy(ClimateStateType.EXTENDED);
+			IClimateState lastState = state.copy(false);
+			state = housing.getBiome().copy(true);
 			for (IClimateModifier modifier : ClimateSystem.INSTANCE.getModifiers()) {
-				state = modifier.modifyTarget(this, state, lastState, modifierData).copy(ClimateStateType.EXTENDED);
+				state = modifier.modifyTarget(this, state, lastState, modifierData).toMutable();
 			}
+			state = state.toImmutable();
 			if (!state.equals(lastState)) {
 				BlockPos coordinates = housing.getCoordinates();
 				NetworkUtil.sendNetworkPacket(new PacketUpdateClimate(coordinates, this), coordinates, housing.getWorldObj());
@@ -129,8 +131,8 @@ public class ClimateLogic implements IClimateLogic, IStreamable {
 		if (humidityDown != 0) {
 			humidityDown /= sizeModifier;
 		}
-		boundaryUp = housing.getDefaultClimate().add(ClimateStates.of(temperatureUp, humidityUp));
-		boundaryDown = housing.getDefaultClimate().remove(ClimateStates.of(temperatureDown, humidityDown));
+		boundaryUp = housing.getBiome().add(ClimateStates.of(temperatureUp, humidityUp));
+		boundaryDown = housing.getBiome().remove(ClimateStates.of(temperatureDown, humidityDown));
 	}
 
 	@Override
@@ -225,6 +227,22 @@ public class ClimateLogic implements IClimateLogic, IStreamable {
 			return false;
 		}
 		return this.housing.getCoordinates().equals(parent.getCoordinates());
+	}
+
+	@Override
+	public boolean isInRange(BlockPos pos) {
+		BlockPos home = housing.getCoordinates();
+		return home.distanceSq(pos) >= range;
+	}
+
+	@Override
+	public double getRange() {
+		return range;
+	}
+
+	@Override
+	public boolean isInvalid() {
+		return housing.isTileInvalid();
 	}
 
 	@Override

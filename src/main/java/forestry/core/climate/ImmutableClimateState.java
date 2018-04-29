@@ -13,89 +13,90 @@ package forestry.core.climate;
 import com.google.common.base.MoreObjects;
 
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.math.MathHelper;
 
-import forestry.api.climate.ClimateStateType;
-import forestry.api.climate.IClimateInfo;
 import forestry.api.climate.IClimateState;
 
-class ClimateState implements IClimateState, IClimateInfo {
+class ImmutableClimateState implements IClimateState {
 
 	// The minimum climate state.
-	static final ClimateState MIN = new ClimateState(0.0F, 0.0F, ClimateStateType.DEFAULT);
+	static final ImmutableClimateState MIN = new ImmutableClimateState(0.0F, 0.0F);
 	// The maximum climate state.
-	static final ClimateState MAX = new ClimateState(2.0F, 2.0F, ClimateStateType.DEFAULT);
+	static final ImmutableClimateState MAX = new ImmutableClimateState(2.0F, 2.0F);
 
-	private static final String TEMPERATURE_NBT_KEY = "TEMP";
-	private static final String HUMIDITY_NBT_KEY = "HUMID";
-	private static final String TYPE_NBT_KEY = "TYPE";
+	public static final String TEMPERATURE_NBT_KEY = "TEMP";
+	public static final String HUMIDITY_NBT_KEY = "HUMID";
 	public static final String ABSENT_NBT_KEY = "ABSENT";
+	public static final String MUTABLE_NBT_KEY = "MUTABLE";
 
-	protected final ClimateStateType type;
 	protected final float temperature;
 	protected final float humidity;
 
-	ClimateState(IClimateState climateState, ClimateStateType type) {
-		this(climateState.getTemperature(), climateState.getHumidity(), type);
+	ImmutableClimateState(IClimateState climateState) {
+		this(climateState.getTemperature(), climateState.getHumidity());
 	}
 
-	ClimateState(float temperature, float humidity, ClimateStateType type) {
-		this.type = type;
-		this.temperature = type.clamp(temperature);
-		this.humidity = type.clamp(humidity);
+	ImmutableClimateState(float temperature, float humidity) {
+		this.temperature = MathHelper.clamp(temperature, 0.0F, 2.0F);
+		this.humidity = MathHelper.clamp(humidity, 0.0F, 2.0F);
 	}
 
-	ClimateState(NBTTagCompound compound, ClimateStateType type) {
-		this.type = type;
-		this.temperature = type.clamp(compound.getFloat(TEMPERATURE_NBT_KEY));
-		this.humidity = type.clamp(compound.getFloat(HUMIDITY_NBT_KEY));
-	}
-
-	ClimateState(NBTTagCompound compound) {
-		this(compound, ClimateStateType.values()[compound.getByte(TYPE_NBT_KEY)]);
+	ImmutableClimateState(NBTTagCompound compound) {
+		this.temperature = MathHelper.clamp(compound.getFloat(TEMPERATURE_NBT_KEY), 0.0F, 2.0F);
+		this.humidity = MathHelper.clamp(compound.getFloat(HUMIDITY_NBT_KEY), 0.0F, 2.0F);
 	}
 	
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		compound.setFloat(TEMPERATURE_NBT_KEY, temperature);
 		compound.setFloat(HUMIDITY_NBT_KEY, humidity);
-		compound.setByte(TYPE_NBT_KEY, (byte)type.ordinal());
 		compound.setBoolean(ABSENT_NBT_KEY, !isPresent());
 		return compound;
 	}
 
 	@Override
-	public IClimateState copy(ClimateStateType type) {
-		return new ClimateState(this, type);
+	public IClimateState copy(boolean mutable) {
+		return ClimateStates.INSTANCE.create(this, mutable);
 	}
 
 	@Override
 	public IClimateState copy() {
-		return new ClimateState(this, type);
+		return copy(false);
+	}
+
+	@Override
+	public IClimateState toMutable() {
+		return copy(true);
+	}
+
+	@Override
+	public IClimateState toImmutable() {
+		return this;
 	}
 
 	@Override
 	public IClimateState addTemperature(float temperature){
-		return ClimateStates.of(this.temperature + temperature, humidity, type);
+		return ClimateStates.of(this.temperature + temperature, humidity);
 	}
 	
 	@Override
 	public IClimateState addHumidity(float humidity){
-		return ClimateStates.of(temperature, this.humidity + humidity, type);
+		return ClimateStates.of(temperature, this.humidity + humidity);
 	}
 	
 	@Override
 	public IClimateState add(IClimateState state){
-		return ClimateStates.of(this.temperature + state.getTemperature(), this.humidity + state.getHumidity(), type);
+		return ClimateStates.of(this.temperature + state.getTemperature(), this.humidity + state.getHumidity());
 	}
 
 	@Override
 	public IClimateState scale(double factor) {
-		return ClimateStates.of((float) (this.temperature * factor), (float) (this.humidity * factor), type);
+		return ClimateStates.of((float) (this.temperature * factor), (float) (this.humidity * factor));
 	}
 
 	@Override
 	public IClimateState remove(IClimateState state){
-		return ClimateStates.of(this.temperature - state.getTemperature(), this.humidity - state.getHumidity(), type);
+		return ClimateStates.of(this.temperature - state.getTemperature(), this.humidity - state.getHumidity());
 	}
 
 	@Override
@@ -104,10 +105,10 @@ class ClimateState implements IClimateState, IClimateInfo {
 	}
 
 	@Override
-	public ClimateStateType getType() {
-		return type;
+	public boolean isMutable() {
+		return false;
 	}
-	
+
 	@Override
 	public float getTemperature() {
 		return temperature;

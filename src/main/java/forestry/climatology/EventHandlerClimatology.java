@@ -1,17 +1,23 @@
 package forestry.climatology;
 
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
+import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.world.ChunkDataEvent;
 
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import forestry.climatology.api.climate.IClimateChunk;
+import forestry.climatology.climate.ClimateHolder;
+import forestry.core.config.Constants;
 
 public class EventHandlerClimatology {
+
+	private static final ResourceLocation CLIMATE_KEY = new ResourceLocation(Constants.MOD_ID, "climate_holder");
 
 	@SubscribeEvent
 	public void onLoadChunk(ChunkDataEvent.Load event) {
@@ -32,6 +38,11 @@ public class EventHandlerClimatology {
 			chunk.writeToNBT(compound);
 			event.getData().setTag("Climate", compound);
 		}
+	}
+
+	@SubscribeEvent
+	public void onGatherCapabilities(AttachCapabilitiesEvent<Chunk> event){
+		event.addCapability(CLIMATE_KEY, new ClimateHolder());
 	}
 
 	private long getPos(Chunk chunk) {

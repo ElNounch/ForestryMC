@@ -15,9 +15,11 @@ import com.google.common.base.Preconditions;
 import javax.annotation.Nullable;
 
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.capabilities.CapabilityManager;
 
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -25,13 +27,16 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import forestry.api.circuits.ChipsetManager;
 import forestry.api.circuits.CircuitSocketType;
 import forestry.api.circuits.ICircuitLayout;
-import forestry.api.climate.ClimateType;
 import forestry.api.core.ForestryAPI;
 import forestry.api.core.Tabs;
 import forestry.api.modules.ForestryModule;
+import forestry.climatology.api.climate.IClimateHolder;
+import forestry.climatology.api.climate.IClimateListener;
 import forestry.climatology.api.climate.IClimateSystem;
 import forestry.climatology.blocks.BlockRegistryClimatology;
-import forestry.climatology.circuits.CircuitHabitatFormer;
+import forestry.climatology.circuits.CircuitHabitatformer;
+import forestry.climatology.climate.ClimateHolder;
+import forestry.climatology.climate.FakeClimateListener;
 import forestry.climatology.climate.modifiers.AltitudeModifier;
 import forestry.climatology.climate.modifiers.ClimateSourceModifier;
 import forestry.climatology.climate.modifiers.TimeModifier;
@@ -41,17 +46,21 @@ import forestry.climatology.network.PacketRegistryClimatology;
 import forestry.climatology.proxy.ProxyClimatology;
 import forestry.climatology.tiles.TileClimatiser;
 import forestry.climatology.tiles.TileFan;
-import forestry.climatology.tiles.TileHabitatFormer;
+import forestry.climatology.tiles.TileHabitatformer;
 import forestry.climatology.tiles.TileHeater;
 import forestry.climatology.tiles.TileHygroregulator;
 import forestry.core.CreativeTabForestry;
 import forestry.core.ModuleCore;
+import forestry.core.capabilities.NullStorage;
 import forestry.core.circuits.CircuitLayout;
 import forestry.core.circuits.Circuits;
+import forestry.core.circuits.EnumCircuitBoardType;
 import forestry.core.config.Constants;
 import forestry.core.items.EnumElectronTube;
 import forestry.core.items.ItemRegistryCore;
 import forestry.core.network.IPacketRegistry;
+import forestry.core.recipes.RecipeUtil;
+import forestry.core.utils.OreDictUtil;
 import forestry.modules.BlankForestryModule;
 import forestry.modules.ForestryModuleUids;
 
@@ -98,11 +107,14 @@ public class ModuleClimatology extends BlankForestryModule {
 
 		ICircuitLayout layoutManaged = new CircuitLayout("habitat.former", CircuitSocketType.HABITAT_FORMER);
 		ChipsetManager.circuitRegistry.registerLayout(layoutManaged);
+		// Capabilities
+		CapabilityManager.INSTANCE.register(IClimateHolder.class, new NullStorage<>(), ClimateHolder::new);
+		CapabilityManager.INSTANCE.register(IClimateListener.class, new NullStorage<>(), () -> FakeClimateListener.INSTANCE);
 	}
 
 	@Override
 	public void doInit() {
-		GameRegistry.registerTileEntity(TileHabitatFormer.class, "forestry.HabitatFormer");
+		GameRegistry.registerTileEntity(TileHabitatformer.class, "forestry.HabitatFormer");
 		GameRegistry.registerTileEntity(TileClimatiser.class, "forestry.ClimatiserLegacy");
 		GameRegistry.registerTileEntity(TileHygroregulator.class, "forestry.ClimateSourceHygroregulator");
 		GameRegistry.registerTileEntity(TileFan.class, "forestry.GreenhouseFan");
@@ -114,25 +126,72 @@ public class ModuleClimatology extends BlankForestryModule {
 		system.registerModifier(new AltitudeModifier());
 		system.registerModifier(new ClimateSourceModifier());
 
-		Circuits.climatiserTemperature1 = new CircuitHabitatFormer("climatiser.temperature.1", ClimateType.TEMPERATURE, 0.125F, 0.125F, 0.25F);
-		Circuits.climatiserTemperature2 = new CircuitHabitatFormer("climatiser.temperature.2", ClimateType.TEMPERATURE, 0.25F, 0.25F, 0.5F);
-		Circuits.climatiserHumidity1 = new CircuitHabitatFormer("climatiser.humidity.1", ClimateType.HUMIDITY, 0.125F, 0.125F, 0.25F);
-		Circuits.climatiserHumidity2 = new CircuitHabitatFormer("climatiser.humidity.2", ClimateType.HUMIDITY, 0.25F, 0.25F, 0.5F);
+		Circuits.formerRange1 = new CircuitHabitatformer("former.range.1", 0.05F, 0.1F, 0.0F);
+		Circuits.formerRange2 = new CircuitHabitatformer("former.range.2", 0.0875F, 0.175F, 0.0F);
+		Circuits.formerRange3 = new CircuitHabitatformer("former.range.3", 0.125F, 0.25F, 0.0F);
+		Circuits.formerEfficiency1 = new CircuitHabitatformer("former.efficiency.1", 0.0F, 0.0F, -0.075F);
+		Circuits.formerEfficiency2 = new CircuitHabitatformer("former.efficiency.2", 0.0F, 0.0F, -0.10F);
+		Circuits.formerEfficiency3 = new CircuitHabitatformer("former.efficiency.3", 0.0F, 0.0F, -0.125F);
+		Circuits.formerSpeed1= new CircuitHabitatformer("former.speed.1", 0.15F, 0.0F, 0.0F);
+		Circuits.formerSpeed2 = new CircuitHabitatformer("former.speed.2", 0.20F, 0.0F, 0.0F);
+		Circuits.formerSpeed3 = new CircuitHabitatformer("former.speed.3", 0.25F, 0.0F, 0.0F);
 		proxy.inti();
 	}
 
 	@Override
 	public void registerRecipes() {
 		ItemRegistryCore coreItems = ModuleCore.getItems();
+		BlockRegistryClimatology blocks = getBlocks();
+
+		RecipeUtil.addRecipe("habitatformer", new ItemStack(blocks.habitatformer),
+			"GRG",
+			"TST",
+			"BCB",
+			'S', coreItems.sturdyCasing,
+			'G', OreDictUtil.BLOCK_GLASS,
+			'B', OreDictUtil.GEAR_BRONZE,
+			'R', OreDictUtil.DUST_REDSTONE,
+			'C', coreItems.circuitboards.get(EnumCircuitBoardType.BASIC),
+			'T', coreItems.tubes.get(EnumElectronTube.IRON, 1));
+		RecipeUtil.addRecipe("habitatformer_heater", new ItemStack(blocks.heater),
+			"WRW",
+			"TST",
+			"WRW",
+			'S', coreItems.sturdyCasing,
+			'W', OreDictUtil.PLANK_WOOD,
+			'R', OreDictUtil.DUST_REDSTONE,
+			'T', coreItems.tubes.get(EnumElectronTube.GOLD, 1));
+		RecipeUtil.addRecipe("habitatformer_fan", new ItemStack(blocks.fan),
+			"WRW",
+			"TST",
+			"WRW",
+			'S', coreItems.sturdyCasing,
+			'W', OreDictUtil.PLANK_WOOD,
+			'R', OreDictUtil.DUST_REDSTONE,
+			'T', coreItems.tubes.get(EnumElectronTube.BRONZE, 1));
+		RecipeUtil.addRecipe("habitatformer_hygroregulator", new ItemStack(blocks.hygroregulator),
+			"WRW",
+			"GSG",
+			"WRW",
+			'S', coreItems.sturdyCasing,
+			'W', OreDictUtil.PLANK_WOOD,
+			'R', OreDictUtil.DUST_REDSTONE,
+			'G', OreDictUtil.BLOCK_GLASS);
+
 
 		ICircuitLayout layout = ChipsetManager.circuitRegistry.getLayout("forestry.habitat.former");
 		if (layout == null) {
 			return;
 		}
-		ChipsetManager.solderManager.addRecipe(layout, coreItems.tubes.get(EnumElectronTube.GOLD, 1), Circuits.climatiserTemperature1);
-		ChipsetManager.solderManager.addRecipe(layout, coreItems.tubes.get(EnumElectronTube.BLAZE, 1), Circuits.climatiserTemperature2);
-		ChipsetManager.solderManager.addRecipe(layout, coreItems.tubes.get(EnumElectronTube.LAPIS, 1), Circuits.climatiserHumidity1);
-		ChipsetManager.solderManager.addRecipe(layout, coreItems.tubes.get(EnumElectronTube.OBSIDIAN, 1), Circuits.climatiserHumidity2);
+		ChipsetManager.solderManager.addRecipe(layout, coreItems.tubes.get(EnumElectronTube.BRONZE, 1), Circuits.formerRange1);
+		ChipsetManager.solderManager.addRecipe(layout, coreItems.tubes.get(EnumElectronTube.LAPIS, 1), Circuits.formerRange2);
+		ChipsetManager.solderManager.addRecipe(layout, coreItems.tubes.get(EnumElectronTube.EMERALD, 1), Circuits.formerRange3);
+		ChipsetManager.solderManager.addRecipe(layout, coreItems.tubes.get(EnumElectronTube.IRON, 1), Circuits.formerEfficiency1);
+		ChipsetManager.solderManager.addRecipe(layout, coreItems.tubes.get(EnumElectronTube.GOLD, 1), Circuits.formerEfficiency2);
+		ChipsetManager.solderManager.addRecipe(layout, coreItems.tubes.get(EnumElectronTube.DIAMOND, 1), Circuits.formerEfficiency3);
+		ChipsetManager.solderManager.addRecipe(layout, coreItems.tubes.get(EnumElectronTube.TIN, 1), Circuits.formerSpeed1);
+		ChipsetManager.solderManager.addRecipe(layout, coreItems.tubes.get(EnumElectronTube.BLAZE, 1), Circuits.formerSpeed2);
+		ChipsetManager.solderManager.addRecipe(layout, coreItems.tubes.get(EnumElectronTube.ENDER, 1), Circuits.formerSpeed3);
 	}
 
 	@Override

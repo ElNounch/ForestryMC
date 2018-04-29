@@ -11,18 +11,6 @@ import net.minecraft.world.World;
 public interface IClimateManager {
 
 	/**
-	 * @deprecated Use {@link IClimateStates#create(float, float, ClimateStateType)}
-	 */
-	@Deprecated
-	IClimateInfo createInfo(float temperature, float humidity);
-
-	/**
-	 * @deprecated Use {@link #getClimateState(World, BlockPos)}
-	 */
-	@Deprecated
-	IClimateInfo getInfo(World world, BlockPos pos);
-
-	/**
 	 * Gets the current state of a container at this position or setSettings one with the datas from the biome.
 	 * @since 5.3.4
 	 */

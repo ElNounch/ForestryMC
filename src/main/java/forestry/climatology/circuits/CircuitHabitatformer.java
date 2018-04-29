@@ -12,22 +12,19 @@ package forestry.climatology.circuits;
 
 import javax.annotation.Nullable;
 
-import forestry.api.climate.ClimateType;
 import forestry.climatology.api.climate.source.IClimateSource;
 import forestry.climatology.api.climate.source.IClimateSourceCircuitable;
 import forestry.climatology.api.climate.source.IClimateSourceProxy;
-import forestry.climatology.tiles.TileHabitatFormer;
+import forestry.climatology.tiles.TileHabitatformer;
 import forestry.core.circuits.Circuit;
 
-public class CircuitHabitatFormer extends Circuit {
-	private ClimateType type;
-	private float changeChange;
-	private float rangeChange;
-	private float energyChange;
+public class CircuitHabitatformer extends Circuit {
+	private final float changeChange;
+	private final float rangeChange;
+	private final float energyChange;
 
-	public CircuitHabitatFormer(String uid, ClimateType type, float changeChange, float rangeChange, float energyChange) {
+	public CircuitHabitatformer(String uid,  float changeChange, float rangeChange, float energyChange) {
 		super(uid);
-		this.type = type;
 		this.changeChange = changeChange;
 		this.rangeChange = rangeChange;
 		this.energyChange = energyChange;
@@ -35,7 +32,7 @@ public class CircuitHabitatFormer extends Circuit {
 
 	@Override
 	public boolean isCircuitable(Object tile) {
-		return tile instanceof TileHabitatFormer;
+		return tile instanceof TileHabitatformer;
 	}
 
 	@Override
@@ -48,7 +45,7 @@ public class CircuitHabitatFormer extends Circuit {
 		if (!(source instanceof IClimateSourceCircuitable)) {
 			return;
 		}
-		((IClimateSourceCircuitable) source).changeSourceConfig(type, changeChange, rangeChange, energyChange);
+		//((IClimateSourceCircuitable) source).changeSourceConfig(type, changeChange, rangeChange, energyChange);
 	}
 
 	@Override
@@ -66,7 +63,7 @@ public class CircuitHabitatFormer extends Circuit {
 		if (!(source instanceof IClimateSourceCircuitable)) {
 			return;
 		}
-		((IClimateSourceCircuitable) source).changeSourceConfig(type, -changeChange, -rangeChange, -energyChange);
+		//((IClimateSourceCircuitable) source).changeSourceConfig(type, -changeChange, -rangeChange, -energyChange);
 	}
 
 	@Override

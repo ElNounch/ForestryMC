@@ -14,7 +14,10 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import forestry.climatology.network.packets.PacketSelectClimateTargeted;
+import forestry.climatology.network.packets.PacketUpdateListener;
+import forestry.climatology.network.packets.PacketUpdateListenerEntity;
 import forestry.core.network.IPacketRegistry;
+import forestry.core.network.PacketIdClient;
 import forestry.core.network.PacketIdServer;
 
 public class PacketRegistryClimatology implements IPacketRegistry {
@@ -26,5 +29,7 @@ public class PacketRegistryClimatology implements IPacketRegistry {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void registerPacketsClient() {
+		PacketIdClient.UPDATE_LISTENER.setPacketHandler(new PacketUpdateListener.Handler());
+		PacketIdClient.UPDATE_LISTENER_ENTITY.setPacketHandler(new PacketUpdateListenerEntity.Handler());
 	}
 }

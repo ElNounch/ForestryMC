@@ -19,7 +19,7 @@ import forestry.climatology.api.climate.IClimateLogic;
 import forestry.climatology.gui.widgets.WidgetClimateBar;
 import forestry.climatology.gui.widgets.WidgetHabitatBar;
 import forestry.climatology.network.packets.PacketSelectClimateTargeted;
-import forestry.climatology.tiles.TileHabitatFormer;
+import forestry.climatology.tiles.TileHabitatformer;
 import forestry.core.config.Constants;
 import forestry.core.gui.GuiForestryTitled;
 import forestry.core.gui.widgets.SocketWidget;
@@ -28,10 +28,10 @@ import forestry.core.utils.Translator;
 
 public class GuiHabitatformer extends GuiForestryTitled<ContainerHabitatformer> {
 
-	private final TileHabitatFormer tile;
+	private final TileHabitatformer tile;
 	private final IClimateLogic logic;
 
-	public GuiHabitatformer(EntityPlayer player, TileHabitatFormer tile) {
+	public GuiHabitatformer(EntityPlayer player, TileHabitatformer tile) {
 		super(Constants.TEXTURE_PATH_GUI + "/habitat_former.png", new ContainerHabitatformer(player.inventory, tile), tile);
 		this.logic = tile.getLogic();
 		this.tile = tile;

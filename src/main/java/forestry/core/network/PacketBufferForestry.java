@@ -15,10 +15,10 @@ import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 
-import forestry.api.climate.ClimateStateType;
 import forestry.api.climate.IClimateState;
 import forestry.core.climate.AbsentClimateState;
 import forestry.core.climate.ClimateStates;
+
 import io.netty.buffer.ByteBuf;
 
 public class PacketBufferForestry extends PacketBuffer {
@@ -173,9 +173,9 @@ public class PacketBufferForestry extends PacketBuffer {
 	public void writeClimateState(IClimateState climateState){
 		if(climateState.isPresent()) {
 			writeBoolean(true);
-			writeByte(climateState.getType().ordinal());
 			writeFloat(climateState.getTemperature());
 			writeFloat(climateState.getHumidity());
+			writeBoolean(climateState.isMutable());
 		}else{
 			writeBoolean(false);
 		}
@@ -183,8 +183,7 @@ public class PacketBufferForestry extends PacketBuffer {
 
 	public IClimateState readClimateState(){
 		if(readBoolean()){
-			ClimateStateType type = ClimateStateType.values()[readByte()];
-			return ClimateStates.of(readFloat(), readFloat(), type);
+			return ClimateStates.of(readFloat(), readFloat(), readBoolean());
 		}else{
 			return AbsentClimateState.INSTANCE;
 		}

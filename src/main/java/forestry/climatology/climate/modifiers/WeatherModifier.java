@@ -38,7 +38,7 @@ public class WeatherModifier implements IClimateModifier {
 	@Override
 	public IClimateState modifyTarget(IClimateLogic logic, IClimateState newState, IClimateState oldState, NBTTagCompound data) {
 		World world = logic.getWorldObj();
-		IClimateState defaultClimate = logic.getHousing().getDefaultClimate();
+		IClimateState defaultClimate = logic.getHousing().getBiome();
 		int rainTime = data.getInteger("raintime");
 		if (world.isRaining()) {
 			if (rainTime < RAIN_TIME) {

@@ -11,10 +11,12 @@ import forestry.api.core.ILocatable;
 public interface IClimateHousing extends ILocatable {
 	
 	void onUpdateClimate();
-	
-	/**
-	 * @return The default climate state. It is calculated out of all biome data that this region contains.
-	 */
-	IClimateState getDefaultClimate();
-	
+
+	IClimateState getTarget();
+
+	IClimateState getCurrent();
+
+	IClimateState getBiome();
+
+	boolean isTileInvalid();
 }

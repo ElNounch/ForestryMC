@@ -16,7 +16,6 @@ import javax.annotation.concurrent.Immutable;
 
 import net.minecraft.nbt.NBTTagCompound;
 
-import forestry.api.climate.ClimateStateType;
 import forestry.api.climate.IClimateState;
 
 @Immutable
@@ -26,12 +25,12 @@ public final class AbsentClimateState implements IClimateState {
 
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
-		compound.setBoolean(ClimateState.ABSENT_NBT_KEY, true);
+		compound.setBoolean(ImmutableClimateState.ABSENT_NBT_KEY, true);
 		return compound;
 	}
 
 	@Override
-	public IClimateState copy(ClimateStateType type) {
+	public IClimateState copy(boolean mutable) {
 		return this;
 	}
 
@@ -71,8 +70,18 @@ public final class AbsentClimateState implements IClimateState {
 	}
 
 	@Override
-	public ClimateStateType getType() {
-		return ClimateStateType.DEFAULT;
+	public boolean isMutable() {
+		return false;
+	}
+
+	@Override
+	public IClimateState toMutable() {
+		return this;
+	}
+
+	@Override
+	public IClimateState toImmutable() {
+		return this;
 	}
 
 	@Override

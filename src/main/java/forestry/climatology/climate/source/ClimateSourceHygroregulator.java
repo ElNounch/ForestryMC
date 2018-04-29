@@ -8,7 +8,7 @@
  * Various Contributors including, but not limited to:
  * SirSengir (original work), CovertJaguar, Player, Binnie, MysteriousAges
  ******************************************************************************/
-package forestry.climatology.climate;
+package forestry.climatology.climate.source;
 
 import javax.annotation.Nullable;
 
@@ -60,26 +60,34 @@ public class ClimateSourceHygroregulator extends ClimateSourceCircuitable<TileHy
 	}
 
 	@Override
-	public boolean canWork(IClimateState currentState, ClimateSourceType oppositeType) {
+	public boolean canWork(IClimateState currentState, @Nullable ClimateSourceType oppositeType) {
 		createRecipe();
 		FilteredTank liquidTank = proxy.getLiquidTank();
 		IErrorLogic errorLogic = proxy.getErrorLogic();
 		if (currentRecipe != null && liquidTank.drainInternal(currentRecipe.liquid.amount, false) != null) {
 			errorLogic.setCondition(false, EnumErrorCode.NO_RESOURCE_LIQUID);
+			proxy.setActive(true);
 			return true;
 		}
 		errorLogic.setCondition(true, EnumErrorCode.NO_RESOURCE_LIQUID);
+		proxy.setActive(false);
 		return false;
 	}
 
 	@Override
 	protected void removeResources(IClimateState currentState, @Nullable ClimateSourceType oppositeType) {
+		if(currentRecipe == null){
+			return;
+		}
 		FilteredTank liquidTank = proxy.getLiquidTank();
 		liquidTank.drainInternal(currentRecipe.liquid.amount, true);
 	}
 
 	@Override
 	protected IClimateState getChange(ClimateSourceType type, IClimateState target, IClimateState currentState) {
+		if(currentRecipe == null){
+			return ClimateStates.ZERO;
+		}
 		float temperature = 0.0F;
 		float humidity = 0.0F;
 		if (type.canChangeHumidity()) {
@@ -88,7 +96,7 @@ public class ClimateSourceHygroregulator extends ClimateSourceCircuitable<TileHy
 		if (type.canChangeTemperature()) {
 			temperature += currentRecipe.tempChange * getChangeMultiplier(ClimateType.TEMPERATURE);
 		}
-		return ClimateStates.extendedOf(temperature, humidity);
+		return ClimateStates.mutableOf(temperature, humidity);
 	}
 
 	private void createRecipe() {
