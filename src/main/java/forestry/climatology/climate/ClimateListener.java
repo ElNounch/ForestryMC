@@ -1,4 +1,4 @@
-package forestry.api.climatology.prefab;
+package forestry.climatology.climate;
 
 import javax.annotation.Nullable;
 
