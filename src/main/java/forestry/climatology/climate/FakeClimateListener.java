@@ -18,14 +18,6 @@ public class FakeClimateListener implements IClimateListener {
 	}
 
 	@Override
-	public void update() {
-	}
-
-	@Override
-	public void invalidate() {
-	}
-
-	@Override
 	public IClimateState getState() {
 		return ClimateStates.INSTANCE.absent();
 	}
