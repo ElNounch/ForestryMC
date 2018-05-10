@@ -3,14 +3,10 @@
  *
  * This work (the API) is licensed under the "MIT" License, see LICENSE.txt for details.
  ******************************************************************************/
-package forestry.api.climate;
+package forestry.api.climatology.source;
 
-/**
- * @deprecated TODO: Remove in 1.13,  Use IClimateState
- */
-@Deprecated
-public interface IClimateInfo {
-	float getTemperature();
+import forestry.api.core.ILocatable;
 
-	float getHumidity();
+public interface IClimateSourceProxy<N extends IClimateSource> extends ILocatable {
+	N getNode();
 }

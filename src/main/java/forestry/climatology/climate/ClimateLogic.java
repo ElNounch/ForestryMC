@@ -13,58 +13,64 @@ package forestry.climatology.climate;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
-import forestry.api.climate.ClimateType;
 import forestry.api.climate.IClimateState;
+import forestry.api.climatology.ClimateCapabilities;
+import forestry.api.climatology.IClimateHolder;
 import forestry.api.climatology.IClimateHousing;
+import forestry.api.climatology.IClimateLogic;
+import forestry.api.climatology.source.IClimateSource;
 import forestry.api.core.ForestryAPI;
-import forestry.climatology.ClimateSystem;
-import forestry.climatology.api.climate.IClimateLogic;
-import forestry.climatology.api.climate.IClimateModifier;
-import forestry.climatology.api.climate.source.IClimateSource;
 import forestry.core.climate.AbsentClimateState;
+import forestry.core.climate.ClimateManager;
 import forestry.core.climate.ClimateStates;
-import forestry.core.config.Config;
 import forestry.core.network.IStreamable;
 import forestry.core.network.PacketBufferForestry;
-import forestry.core.network.packets.PacketUpdateClimate;
-import forestry.core.utils.NetworkUtil;
 import forestry.core.utils.TickHelper;
 
 public class ClimateLogic implements IClimateLogic, IStreamable {
 
+	//The default radius of every climate logic.
+	private static final int DEFAULT_BLOCK_RADIUS = 48;
+
+	//The tile entity that provides this logic.
 	protected final IClimateHousing housing;
+	//All climate sources of this logic.
 	protected final Set<IClimateSource> sources;
-	private int delay;
+	//The state that this logic targets to reach.
 	private IClimateState targetedState;
-	private IClimateState boundaryUp;
-	private IClimateState boundaryDown;
-	private double sizeModifier;
-	protected IClimateState state;
-	protected int area;
+	//The current climate state of this logic.
+	protected IClimateState currentState;
 	private NBTTagCompound modifierData;
 	private TickHelper tickHelper;
-	private double range;
+	//The climate state of the biome that is located at the position of this tile.
+	private IClimateState biomeState;
+	//A array that contains the position of every chunk that is in range of this former and loaded.
+	private long[] chunks;
+	//The radius of the habitatformer in blocks
+	private int radius;
+	//True if the logic added itself to the surrounding chunks, false if update() was never called or if the logic has
+	//been invalidated.
+	private boolean active;
 
 	public ClimateLogic(IClimateHousing housing) {
 		this.housing = housing;
 		this.sources = new HashSet<>();
-		this.delay = 20;
-		this.state = housing.getBiome().copy();
+		this.currentState = ClimateStates.INSTANCE.absent();
 		this.modifierData = new NBTTagCompound();
-		this.boundaryUp = ClimateStates.INSTANCE.min();
-		this.boundaryDown = ClimateStates.INSTANCE.min();
+		this.biomeState = AbsentClimateState.INSTANCE;
 		this.targetedState = AbsentClimateState.INSTANCE;
-		this.sizeModifier = 1.0D;
 		this.tickHelper = new TickHelper();
+		this.chunks = new long[0];
+		this.radius = DEFAULT_BLOCK_RADIUS;
+		this.active = false;
 	}
 
 	@Override
@@ -73,81 +79,92 @@ public class ClimateLogic implements IClimateLogic, IStreamable {
 	}
 
 	@Override
-	public void updateClimate() {
-		tickHelper.onTick();
-		if (tickHelper.updateOnInterval(delay)) {
-			IClimateState lastState = state.copy(false);
-			state = housing.getBiome().copy(true);
-			for (IClimateModifier modifier : ClimateSystem.INSTANCE.getModifiers()) {
-				state = modifier.modifyTarget(this, state, lastState, modifierData).toMutable();
+	public void update() {
+		if (!active) {
+			biomeState = ClimateManager.getInstance().getBiomeState(getWorldObj(), getCoordinates());
+			if (!targetedState.isPresent()) {
+				setState(biomeState.copy());
+				setTarget(biomeState);
 			}
-			state = state.toImmutable();
-			if (!state.equals(lastState)) {
+			addChunks();
+			active = true;
+		}
+		tickHelper.onTick();
+		if (tickHelper.updateOnInterval(20)) {
+			IClimateState previousState = currentState.copy(false);
+			currentState = biomeState.copy(true);
+			if (targetedState.isPresent()) {
+				sources.forEach(source -> currentState.add(source.getState()));
+
+				sources.forEach(source -> currentState.add(source.work(this, previousState, targetedState, currentState)));
+			}
+			currentState = currentState.toImmutable();
+			/*if (!state.equals(lastState)) {
 				BlockPos coordinates = housing.getCoordinates();
 				NetworkUtil.sendNetworkPacket(new PacketUpdateClimate(coordinates, this), coordinates, housing.getWorldObj());
+			}*/
+		}
+	}
+
+	/* Climate Holders */
+	@Override
+	public void invalidate() {
+		removeChunks();
+	}
+
+	/**
+	 * Adds this logic from the surrounding chunks.
+	 */
+	private void addChunks() {
+		BlockPos pos = housing.getCoordinates();
+		World world = housing.getWorldObj();
+		Set<Long> chunkSet = new HashSet<>();
+		Vector center = new Vector(pos.getX() >> 4, pos.getZ() >> 4);
+		Vector start = new Vector(center.x - radius, center.z - radius);
+		Vector area = new Vector(radius * 2.0f + 1.0f);
+		for (int x = (int) start.x; x < (int) start.x + area.x; ++x) {
+			for (int z = (int) start.z; z < (int) start.z + area.z; ++z) {
+				Vector current = new Vector(x, z);
+				if (current.distance(center) <= radius + 0.01f && current.distance(center) < radius - 0.5f) {
+					Chunk chunk = world.getChunkProvider().getLoadedChunk((int) current.x, (int) current.z);
+					if (chunk != null) {
+						IClimateHolder holder = chunk.getCapability(ClimateCapabilities.CLIMATE_HOLDER, null);
+						if (holder != null) {
+							holder.addTransformer(this);
+						}
+					}
+					chunkSet.add(current.toChunkPos());
+				}
 			}
 		}
+		this.chunks = chunkSet.stream().mapToLong(l -> l).toArray();
+		active = false;
 	}
 
-	public void setArea(int area) {
-		this.area = area;
-	}
-
-	public int getArea() {
-		return area;
-	}
-
-	@Override
-	public double getSizeModifier() {
-		return sizeModifier;
-	}
-
-	@Override
-	public void recalculateBoundaries() {
-		sizeModifier = Math.max((double) area / (double) Config.climateSourceRange, 1.0D);
-		float temperatureUp = 0.0F;
-		float humidityUp = 0.0F;
-		float temperatureDown = 0.0F;
-		float humidityDown = 0.0F;
-		for (IClimateSource source : sources) {
-			if (source.affectsClimateType(ClimateType.HUMIDITY)) {
-				humidityUp += source.getBoundaryModifier(ClimateType.HUMIDITY, true);
-				humidityDown += source.getBoundaryModifier(ClimateType.HUMIDITY, false);
-			}
-			if (source.affectsClimateType(ClimateType.TEMPERATURE)) {
-				temperatureUp += source.getBoundaryModifier(ClimateType.TEMPERATURE, true);
-				temperatureDown += source.getBoundaryModifier(ClimateType.TEMPERATURE, false);
+	/**
+	 * Removes this logic from the surrounding chunks.
+	 */
+	private void removeChunks() {
+		World world = housing.getWorldObj();
+		for (long chungPos : chunks) {
+			int x = (int) (chungPos & 4294967295L);
+			int y = (int) ((chungPos >> 32) & 4294967295L);
+			Chunk chunk = world.getChunkProvider().getLoadedChunk(x, y);
+			if (chunk != null) {
+				IClimateHolder holder = chunk.getCapability(ClimateCapabilities.CLIMATE_HOLDER, null);
+				if (holder != null) {
+					holder.removeTransformer(this);
+				}
 			}
 		}
-		if (temperatureUp != 0) {
-			temperatureUp /= sizeModifier;
-		}
-		if (temperatureDown != 0) {
-			temperatureDown /= sizeModifier;
-		}
-		if (humidityUp != 0) {
-			humidityUp /= sizeModifier;
-		}
-		if (humidityDown != 0) {
-			humidityDown /= sizeModifier;
-		}
-		boundaryUp = housing.getBiome().add(ClimateStates.of(temperatureUp, humidityUp));
-		boundaryDown = housing.getBiome().remove(ClimateStates.of(temperatureDown, humidityDown));
+		this.chunks = new long[0];
+		this.active = false;
 	}
 
-	@Override
-	public IClimateState getBoundaryDown() {
-		return boundaryDown;
-	}
-
-	@Override
-	public IClimateState getBoundaryUp() {
-		return boundaryUp;
-	}
-
+	/* Save and Load */
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
-		state.writeToNBT(nbt);
+		currentState.writeToNBT(nbt);
 		nbt.setTag("Target", targetedState.writeToNBT(new NBTTagCompound()));
 		nbt.setTag("modifierData", modifierData.copy());
 		return nbt;
@@ -155,23 +172,18 @@ public class ClimateLogic implements IClimateLogic, IStreamable {
 
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
-		state = ForestryAPI.states.create(nbt);
+		currentState = ForestryAPI.states.create(nbt);
 		targetedState = ForestryAPI.states.create(nbt.getCompoundTag("Target"));
 		modifierData = nbt.getCompoundTag("modifierData");
 	}
 
 	@Override
-	public void setTargetedState(IClimateState state) {
-		this.targetedState = state;
-	}
-
-	@Override
-	public IClimateState getTargetedState() {
-		return targetedState;
+	public void setTarget(IClimateState target) {
+		this.targetedState = target;
 	}
 
 	public void setState(IClimateState state) {
-		this.state = state;
+		this.currentState = state;
 	}
 
 	@Override
@@ -191,18 +203,14 @@ public class ClimateLogic implements IClimateLogic, IStreamable {
 
 	@Override
 	public void writeData(PacketBufferForestry data) {
-		data.writeClimateState(state);
-		data.writeClimateState(boundaryUp);
-		data.writeClimateState(boundaryDown);
+		data.writeClimateState(currentState);
 		data.writeClimateState(targetedState);
 		data.writeCompoundTag(modifierData);
 	}
 
 	@Override
 	public void readData(PacketBufferForestry data) throws IOException {
-		state = data.readClimateState();
-		boundaryUp = data.readClimateState();
-		boundaryDown = data.readClimateState();
+		currentState = data.readClimateState();
 		targetedState = data.readClimateState();
 		NBTTagCompound modifierTag = data.readCompoundTag();
 		if (modifierTag == null) {
@@ -212,8 +220,18 @@ public class ClimateLogic implements IClimateLogic, IStreamable {
 	}
 
 	@Override
-	public IClimateState getState() {
-		return state;
+	public IClimateState getCurrent() {
+		return currentState;
+	}
+
+	@Override
+	public IClimateState getTarget() {
+		return targetedState;
+	}
+
+	@Override
+	public IClimateState getBiome() {
+		return biomeState;
 	}
 
 	@Override
@@ -230,32 +248,34 @@ public class ClimateLogic implements IClimateLogic, IStreamable {
 	}
 
 	@Override
-	public boolean isInRange(BlockPos pos) {
-		BlockPos home = housing.getCoordinates();
-		return home.distanceSq(pos) >= range;
-	}
-
-	@Override
-	public double getRange() {
-		return range;
-	}
-
-	@Override
-	public boolean isInvalid() {
-		return housing.isTileInvalid();
-	}
-
-	@Override
 	public int hashCode() {
 		return housing.getCoordinates().hashCode();
 	}
 
 	@Override
-	@SideOnly(Side.CLIENT)
-	public void addModifierInformation(IClimateModifier modifier, ClimateType type, List<String> lines) {
-		if (!modifier.canModify(type)) {
-			return;
+	public int getRadius() {
+		return radius;
+	}
+
+	private static class Vector {
+		private final float x;
+		private final float z;
+
+		private Vector(float value) {
+			this(value, value);
 		}
-		modifier.addInformation(this, modifierData, type, lines);
+
+		private Vector(float x, float z) {
+			this.x = x;
+			this.z = z;
+		}
+
+		public double distance(Vector other) {
+			return Math.sqrt(Math.pow(x - other.x, 2.0) + Math.pow(z - other.z, 2.0));
+		}
+
+		private long toChunkPos() {
+			return ChunkPos.asLong((int) x, (int) z);
+		}
 	}
 }

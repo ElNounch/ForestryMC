@@ -16,24 +16,20 @@ import java.util.Map;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.chunk.Chunk;
 
 import forestry.api.climate.IClimateManager;
 import forestry.api.climate.IClimateProvider;
 import forestry.api.climate.IClimateState;
+import forestry.api.climatology.ClimateCapabilities;
+import forestry.api.climatology.IClimateHolder;
 import forestry.core.DefaultClimateProvider;
-import forestry.core.utils.World2ObjectMap;
 
 public class ClimateManager implements IClimateManager {
 
 	private static final ClimateManager INSTANCE = new ClimateManager();
 
 	private static final Map<Biome, IClimateState> BIOME_STATES = new HashMap<>();
-	
-	private final World2ObjectMap<ClimateWorldManager> managers;
-
-	private ClimateManager() {
-		managers = new World2ObjectMap(world->new ClimateWorldManager(this));
-	}
 	
 	public static ClimateManager getInstance(){
 		return INSTANCE;
@@ -54,11 +50,17 @@ public class ClimateManager implements IClimateManager {
 	
 	@Override
 	public IClimateState getClimateState(World world, BlockPos pos) {
-		ClimateWorldManager manager = managers.get(world);
-		if(manager == null){
-			return getBiomeState(world, pos);
+		Chunk chunk = world.getChunkProvider().getLoadedChunk(pos.getX() >> 4, pos.getZ() >> 4);
+		if(chunk != null && chunk.hasCapability(ClimateCapabilities.CLIMATE_HOLDER, null)){
+			IClimateHolder holder = chunk.getCapability(ClimateCapabilities.CLIMATE_HOLDER, null);
+			if(holder != null){
+				IClimateState state = holder.getState(pos);
+				if(state.isPresent()){
+					return state;
+				}
+			}
 		}
-		return manager.getClimateState(world, pos);
+		return getBiomeState(world, pos);
 	}
 
 	@Override

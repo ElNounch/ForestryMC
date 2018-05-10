@@ -5,11 +5,8 @@
  ******************************************************************************/
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-@API(apiVersion = "5.2.0", owner = "ForestryAPI|core", provides = "ForestryAPI|greenhouse")
 package forestry.api.climatology;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import mcp.MethodsReturnNonnullByDefault;
-
-import net.minecraftforge.fml.common.API;

@@ -59,8 +59,8 @@ public class BlockHabitatformer extends BlockBase<BlockTypeClimatology> implemen
 	@Override
 	public void randomDisplayTick(IBlockState stateIn, World worldIn, BlockPos pos, Random rand) {
 		TileHabitatformer former = TileUtil.getTile(worldIn, pos, TileHabitatformer.class);
-		if(former != null) {
-			ParticleRender.addClimateParticles(worldIn, pos, stateIn, rand, former.getLogic().getState());
+		if (former != null) {
+			ParticleRender.addClimateParticles(worldIn, pos, stateIn, rand, former.getLogic().getCurrent());
 		}
 	}
 

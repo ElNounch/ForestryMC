@@ -12,7 +12,7 @@ package forestry.climatology.climate.source;
 
 import forestry.api.climate.ClimateType;
 import forestry.api.climate.IClimateState;
-import forestry.climatology.api.climate.source.IClimateSource;
+import forestry.api.climatology.source.IClimateSource;
 
 /**
  * The possible types of the {@link IClimateSource}. Which values the {@link IClimateSource} changes in a {@link IClimateState}.

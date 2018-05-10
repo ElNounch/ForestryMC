@@ -3,7 +3,7 @@
  *
  * This work (the API) is licensed under the "MIT" License, see LICENSE.txt for details.
  ******************************************************************************/
-package forestry.climatology.api.climate.source;
+package forestry.api.climatology.source;
 
 import forestry.api.circuits.ICircuit;
 import forestry.api.climate.ClimateType;

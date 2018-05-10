@@ -12,10 +12,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.Capability;
 
 import forestry.api.climate.IClimateState;
-import forestry.climatology.api.climate.ClimatologyCapabilities;
-import forestry.climatology.api.climate.IClimateHolder;
-import forestry.climatology.api.climate.IClimateTransformer;
-import forestry.climatology.api.climate.Position2D;
+import forestry.api.climatology.ClimateCapabilities;
+import forestry.api.climatology.IClimateHolder;
+import forestry.api.climatology.IClimateTransformer;
+import forestry.api.climatology.Position2D;
 import forestry.core.climate.ClimateStates;
 
 public class ClimateHolder implements IClimateHolder {
@@ -43,13 +43,13 @@ public class ClimateHolder implements IClimateHolder {
 	public IClimateState getState(BlockPos pos) {
 		double transformerCount = 0;
 		IClimateState state = ClimateStates.INSTANCE.mutableZero();
-		for(IClimateTransformer transformer : transformers.get(new Position2D(pos))){
-			if(transformer.isInRange(pos)){
+		for (IClimateTransformer transformer : transformers.values()) {
+			if (transformer.isInRange(pos)) {
 				state = state.add(transformer.getCurrent());
 				transformerCount++;
 			}
 		}
-		return transformerCount > 0 ? state.scale(1.0D / transformerCount).toImmutable() : ClimateStates.ZERO;
+		return transformerCount > 0 ? state.scale(1.0D / transformerCount).toImmutable() : ClimateStates.INSTANCE.absent();
 	}
 
 	@Override
@@ -59,12 +59,12 @@ public class ClimateHolder implements IClimateHolder {
 
 	@Override
 	public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing) {
-		return capability == ClimatologyCapabilities.CLIMATE_HOLDER;
+		return capability == ClimateCapabilities.CLIMATE_HOLDER;
 	}
 
 	@Nullable
 	@Override
 	public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
-		return capability == ClimatologyCapabilities.CLIMATE_HOLDER ? ClimatologyCapabilities.CLIMATE_HOLDER.cast(this) : null;
+		return capability == ClimateCapabilities.CLIMATE_HOLDER ? ClimateCapabilities.CLIMATE_HOLDER.cast(this) : null;
 	}
 }

@@ -30,11 +30,11 @@ import forestry.api.apiculture.BeeManager;
 import forestry.api.apiculture.IBeeHousing;
 import forestry.api.apiculture.IBeekeepingLogic;
 import forestry.api.climate.IClimateState;
+import forestry.api.climatology.ClimateCapabilities;
+import forestry.api.climatology.prefab.ClimateListener;
 import forestry.api.core.EnumHumidity;
 import forestry.api.core.EnumTemperature;
 import forestry.apiculture.gui.IGuiBeeHousingDelegate;
-import forestry.climatology.api.climate.ClimatologyCapabilities;
-import forestry.climatology.api.climate.prefab.ClimateListener;
 import forestry.core.network.IStreamableGui;
 import forestry.core.network.PacketBufferForestry;
 import forestry.core.owner.IOwnedTile;
@@ -140,14 +140,14 @@ public abstract class TileBeeHousingBase extends TileBase implements IBeeHousing
 	/* ClimateListener */
 	@Override
 	public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
-		return capability == ClimatologyCapabilities.CLIMATE_LISTENER || super.hasCapability(capability, facing);
+		return capability == ClimateCapabilities.CLIMATE_LISTENER || super.hasCapability(capability, facing);
 	}
 
 	@Nullable
 	@Override
 	public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
-		if(capability == ClimatologyCapabilities.CLIMATE_LISTENER){
-			return ClimatologyCapabilities.CLIMATE_LISTENER.cast(climateListener);
+		if(capability == ClimateCapabilities.CLIMATE_LISTENER){
+			return ClimateCapabilities.CLIMATE_LISTENER.cast(climateListener);
 		}
 		return super.getCapability(capability, facing);
 	}
@@ -163,7 +163,7 @@ public abstract class TileBeeHousingBase extends TileBase implements IBeeHousing
 				doPollenFX(world, getPos().getX(), getPos().getY(), getPos().getZ());
 			}
 		}
-		climateListener.updateClient();
+		climateListener.updateClientSide();
 	}
 
 	@SideOnly(Side.CLIENT)

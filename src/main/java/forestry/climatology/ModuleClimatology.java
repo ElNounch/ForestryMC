@@ -27,20 +27,17 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import forestry.api.circuits.ChipsetManager;
 import forestry.api.circuits.CircuitSocketType;
 import forestry.api.circuits.ICircuitLayout;
+import forestry.api.climatology.IClimateHolder;
+import forestry.api.climatology.IClimateListener;
+import forestry.api.climatology.IClimateTransformer;
 import forestry.api.core.ForestryAPI;
 import forestry.api.core.Tabs;
 import forestry.api.modules.ForestryModule;
-import forestry.climatology.api.climate.IClimateHolder;
-import forestry.climatology.api.climate.IClimateListener;
-import forestry.climatology.api.climate.IClimateSystem;
 import forestry.climatology.blocks.BlockRegistryClimatology;
 import forestry.climatology.circuits.CircuitHabitatformer;
 import forestry.climatology.climate.ClimateHolder;
 import forestry.climatology.climate.FakeClimateListener;
-import forestry.climatology.climate.modifiers.AltitudeModifier;
-import forestry.climatology.climate.modifiers.ClimateSourceModifier;
-import forestry.climatology.climate.modifiers.TimeModifier;
-import forestry.climatology.climate.modifiers.WeatherModifier;
+import forestry.climatology.climate.FakeClimateTransformer;
 import forestry.climatology.items.ItemRegistryClimatology;
 import forestry.climatology.network.PacketRegistryClimatology;
 import forestry.climatology.proxy.ProxyClimatology;
@@ -110,6 +107,7 @@ public class ModuleClimatology extends BlankForestryModule {
 		// Capabilities
 		CapabilityManager.INSTANCE.register(IClimateHolder.class, new NullStorage<>(), ClimateHolder::new);
 		CapabilityManager.INSTANCE.register(IClimateListener.class, new NullStorage<>(), () -> FakeClimateListener.INSTANCE);
+		CapabilityManager.INSTANCE.register(IClimateTransformer.class, new NullStorage<>(), () -> FakeClimateTransformer.INSTANCE);
 	}
 
 	@Override
@@ -120,19 +118,13 @@ public class ModuleClimatology extends BlankForestryModule {
 		GameRegistry.registerTileEntity(TileFan.class, "forestry.GreenhouseFan");
 		GameRegistry.registerTileEntity(TileHeater.class, "forestry.GreenhouseHeater");
 
-		IClimateSystem system = ClimateSystem.INSTANCE;
-		system.registerModifier(new WeatherModifier());
-		system.registerModifier(new TimeModifier());
-		system.registerModifier(new AltitudeModifier());
-		system.registerModifier(new ClimateSourceModifier());
-
 		Circuits.formerRange1 = new CircuitHabitatformer("former.range.1", 0.05F, 0.1F, 0.0F);
 		Circuits.formerRange2 = new CircuitHabitatformer("former.range.2", 0.0875F, 0.175F, 0.0F);
 		Circuits.formerRange3 = new CircuitHabitatformer("former.range.3", 0.125F, 0.25F, 0.0F);
 		Circuits.formerEfficiency1 = new CircuitHabitatformer("former.efficiency.1", 0.0F, 0.0F, -0.075F);
 		Circuits.formerEfficiency2 = new CircuitHabitatformer("former.efficiency.2", 0.0F, 0.0F, -0.10F);
 		Circuits.formerEfficiency3 = new CircuitHabitatformer("former.efficiency.3", 0.0F, 0.0F, -0.125F);
-		Circuits.formerSpeed1= new CircuitHabitatformer("former.speed.1", 0.15F, 0.0F, 0.0F);
+		Circuits.formerSpeed1 = new CircuitHabitatformer("former.speed.1", 0.15F, 0.0F, 0.0F);
 		Circuits.formerSpeed2 = new CircuitHabitatformer("former.speed.2", 0.20F, 0.0F, 0.0F);
 		Circuits.formerSpeed3 = new CircuitHabitatformer("former.speed.3", 0.25F, 0.0F, 0.0F);
 		proxy.inti();

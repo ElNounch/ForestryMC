@@ -1,6 +1,6 @@
 package forestry.climatology.tiles;
 
-import forestry.climatology.api.climate.source.IClimateSourceProxy;
+import forestry.api.climatology.source.IClimateSourceProxy;
 import forestry.climatology.climate.source.ClimateSource;
 
 public interface IClimatiserDefinition<P extends IClimateSourceProxy> {

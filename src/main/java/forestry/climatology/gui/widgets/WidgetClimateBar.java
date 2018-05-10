@@ -18,7 +18,7 @@ import net.minecraft.client.renderer.texture.TextureManager;
 
 import forestry.api.climate.ClimateType;
 import forestry.api.climate.IClimateState;
-import forestry.climatology.api.climate.IClimateLogic;
+import forestry.api.climatology.IClimateLogic;
 import forestry.climatology.gui.GuiHabitatformer;
 import forestry.core.climate.ClimateStates;
 import forestry.core.gui.tooltips.ToolTip;
@@ -56,12 +56,12 @@ public class WidgetClimateBar extends Widget {
 	}
 
 	private int getProgressScaled() {
-		float value = housing.getState().get(type);
+		float value = housing.getCurrent().get(type);
 		return (int) (value * width / MAX_VALUE);
 	}
 
 	private int getPointerPosition() {
-		float targetedValue = housing.getTargetedState().get(type);
+		float targetedValue = housing.getTarget().get(type);
 		return (int) (targetedValue * 49 / MAX_VALUE);
 	}
 
@@ -95,8 +95,8 @@ public class WidgetClimateBar extends Widget {
 
 	@Override
 	public ToolTip getToolTip(int mouseX, int mouseY) {
-		IClimateState targetedState = housing.getTargetedState();
-		IClimateState state = housing.getState();
+		IClimateState targetedState = housing.getTarget();
+		IClimateState state = housing.getCurrent();
 		ToolTip toolTip = new ToolTip();
 		toolTip.add(Translator.translateToLocalFormatted("for.gui.habitatformer.climate.target", VALUE_FORMAT.format(targetedState.get(type))));
 		toolTip.add(Translator.translateToLocalFormatted("for.gui.habitatformer.climate.value", VALUE_FORMAT.format(state.get(type))));

@@ -1,9 +1,9 @@
-package forestry.climatology.api.climate;
+package forestry.api.climatology;
 
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 
-public class ClimatologyCapabilities {
+public class ClimateCapabilities {
 	/**
 	 * Capability for {@link IClimateHolder}.
 	 */
@@ -14,4 +14,9 @@ public class ClimatologyCapabilities {
 	 */
 	@CapabilityInject(IClimateListener.class)
 	public static Capability<IClimateListener> CLIMATE_LISTENER;
+	/**
+	 * Capability for {@link IClimateTransformer}.
+	 */
+	@CapabilityInject(IClimateListener.class)
+	public static Capability<IClimateTransformer> CLIMATE_TRANSFORMER;
 }

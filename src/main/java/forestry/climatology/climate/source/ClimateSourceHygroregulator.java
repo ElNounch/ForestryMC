@@ -76,7 +76,7 @@ public class ClimateSourceHygroregulator extends ClimateSourceCircuitable<TileHy
 
 	@Override
 	protected void removeResources(IClimateState currentState, @Nullable ClimateSourceType oppositeType) {
-		if(currentRecipe == null){
+		if (currentRecipe == null) {
 			return;
 		}
 		FilteredTank liquidTank = proxy.getLiquidTank();
@@ -85,8 +85,8 @@ public class ClimateSourceHygroregulator extends ClimateSourceCircuitable<TileHy
 
 	@Override
 	protected IClimateState getChange(ClimateSourceType type, IClimateState target, IClimateState currentState) {
-		if(currentRecipe == null){
-			return ClimateStates.ZERO;
+		if (currentRecipe == null) {
+			return ClimateStates.ZERO_STATE;
 		}
 		float temperature = 0.0F;
 		float humidity = 0.0F;

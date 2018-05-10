@@ -1,5 +1,6 @@
 package forestry.climatology.climate;
 
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -7,7 +8,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import forestry.api.climate.IClimateState;
-import forestry.climatology.api.climate.IClimateListener;
+import forestry.api.climatology.IClimateListener;
 import forestry.core.climate.ClimateStates;
 
 public class FakeClimateListener implements IClimateListener {
@@ -18,13 +19,13 @@ public class FakeClimateListener implements IClimateListener {
 	}
 
 	@Override
-	public IClimateState getState() {
+	public IClimateState getState(boolean update, boolean syncToClient) {
 		return ClimateStates.INSTANCE.absent();
 	}
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public void updateClient() {
+	public void updateClientSide() {
 
 	}
 
@@ -37,6 +38,18 @@ public class FakeClimateListener implements IClimateListener {
 	@Override
 	public IClimateState getClientState() {
 		return ClimateStates.INSTANCE.absent();
+	}
+
+	@SideOnly(Side.CLIENT)
+	@Override
+	public void syncToClient() {
+
+	}
+
+	@SideOnly(Side.CLIENT)
+	@Override
+	public void syncToClient(EntityPlayerMP player) {
+
 	}
 
 	@Override

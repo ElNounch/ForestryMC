@@ -1,149 +1,64 @@
 package forestry.climatology.tiles;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.chunk.Chunk;
 
 import forestry.api.circuits.ChipsetManager;
 import forestry.api.circuits.CircuitSocketType;
 import forestry.api.circuits.ICircuitBoard;
 import forestry.api.circuits.ICircuitSocketType;
-import forestry.api.climate.IClimateState;
-import forestry.api.climatology.IHabitatformerHousing;
+import forestry.api.climatology.IClimateHousing;
+import forestry.api.climatology.IClimateLogic;
 import forestry.api.core.EnumHumidity;
 import forestry.api.core.EnumTemperature;
-import forestry.climatology.ClimateSystem;
-import forestry.climatology.api.climate.ClimatologyCapabilities;
-import forestry.climatology.api.climate.IClimateHolder;
-import forestry.climatology.api.climate.IClimateLogic;
 import forestry.climatology.climate.ClimateLogic;
 import forestry.climatology.gui.ContainerHabitatformer;
 import forestry.climatology.gui.GuiHabitatformer;
 import forestry.core.circuits.ISocketable;
-import forestry.core.climate.ClimateManager;
-import forestry.core.climate.ClimateStates;
 import forestry.core.inventory.InventoryAdapter;
 import forestry.core.network.PacketBufferForestry;
 import forestry.core.tiles.IClimatised;
 import forestry.core.tiles.TilePowered;
 
-public class TileHabitatformer extends TilePowered implements IHabitatformerHousing, IClimatised, ISocketable {
-	private static final String CONTAINER_NBT_KEY = "Container";
+public class TileHabitatformer extends TilePowered implements IClimateHousing, IClimatised, ISocketable {
+	private static final String LOGIC_NBT_KEY = "Logic";
 
+	//A cache that caches every neighboring tile that contains a climate source
 	private final AdjacentNodeCache nodeCache;
+	//A inventory that contains the circuits of this tile.
 	private final InventoryAdapter sockets = new InventoryAdapter(1, "sockets");
 
+	//The logic that handles the climate  changes.
 	private final ClimateLogic logic;
-	private IClimateState biomeState;
-	private long[] chunks;
-	private float radius;
 
 	public TileHabitatformer() {
 		super(800, 10000);
-		this.biomeState = ClimateStates.INSTANCE.absent();
 		this.logic = new ClimateLogic(this);
 		this.nodeCache = new AdjacentNodeCache(getTileCache(), logic);
-		this.chunks = new long[0];
-		this.radius = 2.9F;
 	}
 
 	@Override
 	protected void updateServerSide() {
-		if (!biomeState.isPresent()) {
-			biomeState = ClimateManager.getInstance().getBiomeState(world, pos);
-			if (!logic.getTargetedState().isPresent()) {
-				logic.setState(biomeState.copy());
-				logic.setTargetedState(biomeState);
-			}
-			addChunks();
-		}
 		nodeCache.checkChanged();
-		logic.updateClimate();
+		logic.update();
 		super.updateServerSide();
 	}
 
 	@Override
 	public void invalidate() {
 		super.invalidate();
-		removeChunks();
+		logic.invalidate();
 	}
 
 	@Override
 	public void onChunkUnload() {
 		super.onChunkUnload();
-		removeChunks();
-	}
-
-	@Override
-	public void validate() {
-		super.validate();
-		//addChunks();
-	}
-
-	private void addChunks() {
-		Set<Long> chunkSet = new HashSet<>();
-		Vector center = new Vector(pos.getX() >> 4, pos.getZ() >> 4);
-		Vector start = new Vector(center.x - radius, center.z - radius);
-		Vector area = new Vector(radius * 2.0f + 1.0f);
-		for (int x = (int) start.x; x < (int) start.x + area.x; ++x) {
-			for (int z = (int) start.z; z < (int) start.z + area.z; ++z) {
-				Vector current = new Vector(x, z);
-				if (current.distance(center) <= radius + 0.01) {
-					if (current.distance(center) < radius - 0.5f) {
-						ClimateSystem.INSTANCE.addLogic(current.toChunkPos(), logic);
-						Chunk chunk = world.getChunkFromChunkCoords((int)current.x, (int)current.z);
-						if(chunk != null){
-							IClimateHolder holder = chunk.getCapability(ClimatologyCapabilities.CLIMATE_HOLDER, null);
-							if(holder != null) {
-								holder.addTransformer(this);
-							}
-						}
-						chunkSet.add(current.toChunkPos());
-					}
-				}
-			}
-		}
-		this.chunks = chunkSet.stream().mapToLong(l -> l).toArray();
-
-		markChunksForRenderUpdate();
-		logic.setArea(chunkSet.size());
-	}
-
-	private void removeChunks() {
-		for (long chungPos : chunks) {
-			ClimateSystem.INSTANCE.removeLogic(chungPos, logic);
-			int x = (int)(chungPos & 4294967295L);
-			int y = (int)((chungPos >> 32) & 4294967295L);
-			Chunk chunk = world.getChunkFromChunkCoords(x, y);
-			if(chunk != null){
-				IClimateHolder holder = chunk.getCapability(ClimatologyCapabilities.CLIMATE_HOLDER, null);
-				if(holder != null) {
-					holder.removeTransformer(this);
-				}
-			}
-		}
-		chunks = new long[0];
-		markChunksForRenderUpdate();
-		radius = 0;
-		logic.setArea(0);
-	}
-
-	private void markChunksForRenderUpdate() {
-		if (world.isRemote) {
-			int range = (int) (16 * (radius - 1)) + 8;
-			BlockPos startPos = pos.add(-range, -16, -range);
-			BlockPos endPos = pos.add(range, 16, range);
-			world.markBlockRangeForRenderUpdate(startPos, endPos);
-		}
+		logic.invalidate();
 	}
 
 	@Override
@@ -178,34 +93,15 @@ public class TileHabitatformer extends TilePowered implements IHabitatformerHous
 
 	@Override
 	public float getExactTemperature() {
-		return logic.getState().getTemperature();
+		return logic.getCurrent().getTemperature();
 	}
 
 	@Override
 	public float getExactHumidity() {
-		return logic.getState().getHumidity();
-	}
-
-	@Override
-	public int getRange() {
-		return (int)(radius * 16);
+		return logic.getCurrent().getHumidity();
 	}
 
 	/* Methods - Implement IGreenhouseHousing */
-	@Override
-	public void onUpdateClimate() {
-	}
-
-	@Override
-	public IClimateState getBiome() {
-		return biomeState;
-	}
-
-	@Override
-	public boolean isTileInvalid() {
-		return isInvalid();
-	}
-
 	@Override
 	public IClimateLogic getLogic() {
 		return logic;
@@ -273,7 +169,7 @@ public class TileHabitatformer extends TilePowered implements IHabitatformerHous
 	public NBTTagCompound writeToNBT(NBTTagCompound data) {
 		super.writeToNBT(data);
 
-		data.setTag(CONTAINER_NBT_KEY, logic.writeToNBT(new NBTTagCompound()));
+		data.setTag(LOGIC_NBT_KEY, logic.writeToNBT(new NBTTagCompound()));
 
 		sockets.writeToNBT(data);
 
@@ -284,8 +180,8 @@ public class TileHabitatformer extends TilePowered implements IHabitatformerHous
 	public void readFromNBT(NBTTagCompound data) {
 		super.readFromNBT(data);
 
-		if (data.hasKey(CONTAINER_NBT_KEY)) {
-			NBTTagCompound nbtTag = data.getCompoundTag(CONTAINER_NBT_KEY);
+		if (data.hasKey(LOGIC_NBT_KEY)) {
+			NBTTagCompound nbtTag = data.getCompoundTag(LOGIC_NBT_KEY);
 			logic.readFromNBT(nbtTag);
 		}
 
@@ -297,28 +193,6 @@ public class TileHabitatformer extends TilePowered implements IHabitatformerHous
 			if (chipset != null) {
 				chipset.onLoad(this);
 			}
-		}
-	}
-
-	private static class Vector {
-		private final float x;
-		private final float z;
-
-		private Vector(float value) {
-			this(value, value);
-		}
-
-		private Vector(float x, float z) {
-			this.x = x;
-			this.z = z;
-		}
-
-		public double distance(Vector other) {
-			return Math.sqrt(Math.pow(x - other.x, 2.0) + Math.pow(z - other.z, 2.0));
-		}
-
-		private long toChunkPos() {
-			return ChunkPos.asLong((int) x, (int) z);
 		}
 	}
 }

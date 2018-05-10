@@ -26,8 +26,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import forestry.api.climate.IClimateState;
+import forestry.api.climatology.IClimateLogic;
 import forestry.api.core.ForestryAPI;
-import forestry.climatology.api.climate.IClimateLogic;
 import forestry.climatology.gui.GuiHabitatformer;
 import forestry.core.climate.ClimateStates;
 import forestry.core.gui.tooltips.ToolTip;
@@ -153,7 +153,7 @@ public class WidgetHabitatBar extends Widget {
 		}
 
 		private double getComparingCode() {
-			IClimateState target = logic.getTargetedState();
+			IClimateState target = logic.getTarget();
 			IClimateState state = climate.climateState;
 			double temp = target.getTemperature() - state.getTemperature();
 			double hem = target.getHumidity() - state.getHumidity();

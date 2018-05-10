@@ -11,8 +11,8 @@
 package forestry.climatology.climate.source;
 
 import forestry.api.climate.ClimateType;
-import forestry.climatology.api.climate.source.IClimateSourceCircuitable;
-import forestry.climatology.api.climate.source.IClimateSourceProxy;
+import forestry.api.climatology.source.IClimateSourceCircuitable;
+import forestry.api.climatology.source.IClimateSourceProxy;
 
 public abstract class ClimateSourceCircuitable<P extends IClimateSourceProxy> extends ClimateSource<P> implements IClimateSourceCircuitable<P> {
 	protected float changeMultiplierTemperature = 1.0f;

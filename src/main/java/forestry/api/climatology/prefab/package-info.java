@@ -3,10 +3,10 @@
  *
  * This work (the API) is licensed under the "MIT" License, see LICENSE.txt for details.
  ******************************************************************************/
-package forestry.climatology.api.climate.source;
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
+package forestry.api.climatology.prefab;
 
-import forestry.api.core.ILocatable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
-public interface IClimateSourceProxy<N extends IClimateSource> extends ILocatable {
-	N getNode();
-}
+import mcp.MethodsReturnNonnullByDefault;

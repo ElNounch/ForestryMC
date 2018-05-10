@@ -14,12 +14,12 @@ import net.minecraft.nbt.NBTTagCompound;
 
 import forestry.api.climate.IClimateState;
 import forestry.api.climate.IClimateStates;
-import forestry.climatology.climate.modifiers.ClimateSourceModifier;
 
 public final class ClimateStates implements IClimateStates {
 
 	public static final ClimateStates INSTANCE = new ClimateStates();
-	public static final IClimateState ZERO = of(0.0F, 0.0F);
+	public static final IClimateState ZERO_STATE = ImmutableClimateState.MIN;
+	private static final float CLIMATE_CHANGE = 0.01F;
 
 	private ClimateStates() {
 	}
@@ -37,18 +37,18 @@ public final class ClimateStates implements IClimateStates {
 	}
 
 	public static boolean isNearTarget(IClimateState state, IClimateState target) {
-		return target.getHumidity() - ClimateSourceModifier.CLIMATE_CHANGE < state.getHumidity()
-			&& target.getHumidity() + ClimateSourceModifier.CLIMATE_CHANGE > state.getHumidity()
-			&& target.getTemperature() - ClimateSourceModifier.CLIMATE_CHANGE < state.getTemperature()
-			&& target.getTemperature() + ClimateSourceModifier.CLIMATE_CHANGE > state.getTemperature();
+		return target.getHumidity() - CLIMATE_CHANGE < state.getHumidity()
+			&& target.getHumidity() + CLIMATE_CHANGE > state.getHumidity()
+			&& target.getTemperature() - CLIMATE_CHANGE < state.getTemperature()
+			&& target.getTemperature() + CLIMATE_CHANGE > state.getTemperature();
 	}
 
 	public static boolean isZero(IClimateState state) {
-		return state.getHumidity() == ZERO.getHumidity() && state.getTemperature() == ZERO.getTemperature();
+		return state.getHumidity() == ZERO_STATE.getHumidity() && state.getTemperature() == ZERO_STATE.getTemperature();
 	}
 
 	public static boolean isNearZero(IClimateState state) {
-		return isNearTarget(state, ZERO);
+		return isNearTarget(state, ZERO_STATE);
 	}
 
 	@Override
@@ -127,7 +127,7 @@ public final class ClimateStates implements IClimateStates {
 
 	@Override
 	public IClimateState zero() {
-		return ZERO;
+		return ZERO_STATE;
 	}
 
 	@Override

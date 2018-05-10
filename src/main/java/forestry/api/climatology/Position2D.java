@@ -1,4 +1,4 @@
-package forestry.climatology.api.climate;
+package forestry.api.climatology;
 
 import com.google.common.base.MoreObjects;
 

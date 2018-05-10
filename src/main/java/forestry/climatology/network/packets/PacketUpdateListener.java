@@ -10,15 +10,15 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import forestry.api.climate.IClimateState;
-import forestry.climatology.api.climate.ClimatologyCapabilities;
-import forestry.climatology.api.climate.IClimateListener;
+import forestry.api.climatology.ClimateCapabilities;
+import forestry.api.climatology.IClimateListener;
 import forestry.core.network.ForestryPacket;
 import forestry.core.network.IForestryPacketClient;
 import forestry.core.network.IForestryPacketHandlerClient;
 import forestry.core.network.PacketBufferForestry;
 import forestry.core.network.PacketIdClient;
 
-public class PacketUpdateListener extends ForestryPacket implements IForestryPacketClient{
+public class PacketUpdateListener extends ForestryPacket implements IForestryPacketClient {
 	private final BlockPos pos;
 	private final IClimateState state;
 
@@ -45,9 +45,9 @@ public class PacketUpdateListener extends ForestryPacket implements IForestryPac
 			BlockPos pos = data.readBlockPos();
 			IClimateState state = data.readClimateState();
 			TileEntity tileEntity = player.world.getTileEntity(pos);
-			if(tileEntity != null && tileEntity.hasCapability(ClimatologyCapabilities.CLIMATE_LISTENER, null)){
-				IClimateListener listener = tileEntity.getCapability(ClimatologyCapabilities.CLIMATE_LISTENER, null);
-				if(listener != null) {
+			if (tileEntity != null && tileEntity.hasCapability(ClimateCapabilities.CLIMATE_LISTENER, null)) {
+				IClimateListener listener = tileEntity.getCapability(ClimateCapabilities.CLIMATE_LISTENER, null);
+				if (listener != null) {
 					listener.setClientState(state);
 				}
 			}

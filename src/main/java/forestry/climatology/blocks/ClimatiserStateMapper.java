@@ -26,7 +26,7 @@ public class ClimatiserStateMapper extends ForestryStateMapper {
 			if (facing == EnumFacing.DOWN || facing == EnumFacing.UP) {
 				continue;
 			}
-			for(State state : State.values()) {
+			for (State state : State.values()) {
 				IBlockState blockState = block.getDefaultState().withProperty(BlockBase.FACING, facing).withProperty(State.PROPERTY, state);
 				LinkedHashMap<IProperty<?>, Comparable<?>> properties = Maps.newLinkedHashMap(blockState.getProperties());
 				ResourceLocation blockLocation = Block.REGISTRY.getNameForObject(block);

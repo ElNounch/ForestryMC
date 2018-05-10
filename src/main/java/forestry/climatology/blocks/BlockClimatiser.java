@@ -96,10 +96,10 @@ public class BlockClimatiser extends BlockBase<BlockTypeClimatology> implements 
 	@Override
 	public void randomDisplayTick(IBlockState state, World world, BlockPos pos, Random rand) {
 		TileClimatiser tile = TileUtil.getTile(world, pos, TileClimatiser.class);
-		if(tile != null) {
+		if (tile != null) {
 			TileHabitatformer former = tile.getFormer();
-			if(former != null) {
-				ParticleRender.addClimateParticles(world, pos, state, rand, former.getCurrent());
+			if (former != null) {
+				ParticleRender.addClimateParticles(world, pos, state, rand, former.getLogic().getCurrent());
 			}
 		}
 	}

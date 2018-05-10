@@ -15,7 +15,7 @@ import net.minecraft.util.math.BlockPos;
 
 import forestry.api.climate.ClimateType;
 import forestry.api.climate.IClimateState;
-import forestry.climatology.api.climate.IClimateLogic;
+import forestry.api.climatology.IClimateLogic;
 import forestry.climatology.gui.widgets.WidgetClimateBar;
 import forestry.climatology.gui.widgets.WidgetHabitatBar;
 import forestry.climatology.network.packets.PacketSelectClimateTargeted;
@@ -54,16 +54,16 @@ public class GuiHabitatformer extends GuiForestryTitled<ContainerHabitatformer> 
 	}
 
 	public void setClimate(IClimateState state) {
-		logic.setTargetedState(state.copy());
+		logic.setTarget(state.copy());
 		sendNetworkUpdate();
 	}
 
 	public IClimateState getClimate() {
-		return logic.getTargetedState();
+		return logic.getTarget();
 	}
 
 	private void sendNetworkUpdate() {
-		IClimateState targetedState = logic.getTargetedState();
+		IClimateState targetedState = logic.getTarget();
 		if (targetedState.isPresent()) {
 			BlockPos pos = tile.getPos();
 			NetworkUtil.sendToServer(new PacketSelectClimateTargeted(pos, targetedState));

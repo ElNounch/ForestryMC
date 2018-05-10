@@ -9,8 +9,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import forestry.api.climate.IClimateState;
-import forestry.climatology.api.climate.ClimatologyCapabilities;
-import forestry.climatology.api.climate.IClimateListener;
+import forestry.api.climatology.ClimateCapabilities;
+import forestry.api.climatology.IClimateListener;
 import forestry.core.network.ForestryPacket;
 import forestry.core.network.IForestryPacketClient;
 import forestry.core.network.IForestryPacketHandlerClient;
@@ -43,9 +43,9 @@ public class PacketUpdateListenerEntity extends ForestryPacket implements IFores
 		public void onPacketData(PacketBufferForestry data, EntityPlayer player) throws IOException {
 			Entity entity = data.readEntityById(player.world);
 			IClimateState state = data.readClimateState();
-			if(entity != null && entity.hasCapability(ClimatologyCapabilities.CLIMATE_LISTENER, null)){
-				IClimateListener listener = entity.getCapability(ClimatologyCapabilities.CLIMATE_LISTENER, null);
-				if(listener != null) {
+			if (entity != null && entity.hasCapability(ClimateCapabilities.CLIMATE_LISTENER, null)) {
+				IClimateListener listener = entity.getCapability(ClimateCapabilities.CLIMATE_LISTENER, null);
+				if (listener != null) {
 					listener.setClientState(state);
 				}
 			}

@@ -12,9 +12,9 @@ package forestry.climatology.circuits;
 
 import javax.annotation.Nullable;
 
-import forestry.climatology.api.climate.source.IClimateSource;
-import forestry.climatology.api.climate.source.IClimateSourceCircuitable;
-import forestry.climatology.api.climate.source.IClimateSourceProxy;
+import forestry.api.climatology.source.IClimateSource;
+import forestry.api.climatology.source.IClimateSourceCircuitable;
+import forestry.api.climatology.source.IClimateSourceProxy;
 import forestry.climatology.tiles.TileHabitatformer;
 import forestry.core.circuits.Circuit;
 
@@ -23,7 +23,7 @@ public class CircuitHabitatformer extends Circuit {
 	private final float rangeChange;
 	private final float energyChange;
 
-	public CircuitHabitatformer(String uid,  float changeChange, float rangeChange, float energyChange) {
+	public CircuitHabitatformer(String uid, float changeChange, float rangeChange, float energyChange) {
 		super(uid);
 		this.changeChange = changeChange;
 		this.rangeChange = rangeChange;

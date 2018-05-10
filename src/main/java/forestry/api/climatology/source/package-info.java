@@ -5,7 +5,7 @@
  ******************************************************************************/
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-package forestry.climatology.api.climate;
+package forestry.api.climatology.source;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
