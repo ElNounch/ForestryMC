@@ -27,17 +27,14 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import forestry.api.circuits.ChipsetManager;
 import forestry.api.circuits.CircuitSocketType;
 import forestry.api.circuits.ICircuitLayout;
-import forestry.api.climatology.IClimateHolder;
-import forestry.api.climatology.IClimateListener;
-import forestry.api.climatology.IClimateTransformer;
+import forestry.api.climate.IClimateHolder;
+import forestry.api.climate.IClimateListener;
+import forestry.api.climate.IClimateTransformer;
 import forestry.api.core.ForestryAPI;
 import forestry.api.core.Tabs;
 import forestry.api.modules.ForestryModule;
 import forestry.climatology.blocks.BlockRegistryClimatology;
 import forestry.climatology.circuits.CircuitHabitatformer;
-import forestry.climatology.climate.ClimateHolder;
-import forestry.climatology.climate.FakeClimateListener;
-import forestry.climatology.climate.FakeClimateTransformer;
 import forestry.climatology.items.ItemRegistryClimatology;
 import forestry.climatology.network.PacketRegistryClimatology;
 import forestry.climatology.proxy.ProxyClimatology;
@@ -52,6 +49,10 @@ import forestry.core.capabilities.NullStorage;
 import forestry.core.circuits.CircuitLayout;
 import forestry.core.circuits.Circuits;
 import forestry.core.circuits.EnumCircuitBoardType;
+import forestry.core.climate.ClimateHolder;
+import forestry.core.climate.EventHandlerClimate;
+import forestry.core.climate.FakeClimateListener;
+import forestry.core.climate.FakeClimateTransformer;
 import forestry.core.config.Constants;
 import forestry.core.items.EnumElectronTube;
 import forestry.core.items.ItemRegistryCore;
@@ -99,7 +100,7 @@ public class ModuleClimatology extends BlankForestryModule {
 	@Override
 	public void preInit() {
 		proxy.preInti();
-		MinecraftForge.EVENT_BUS.register(new EventHandlerClimatology());
+		MinecraftForge.EVENT_BUS.register(new EventHandlerClimate());
 		proxy.initializeModels();
 
 		ICircuitLayout layoutManaged = new CircuitLayout("habitat.former", CircuitSocketType.HABITAT_FORMER);

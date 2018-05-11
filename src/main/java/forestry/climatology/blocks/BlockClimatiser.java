@@ -99,7 +99,7 @@ public class BlockClimatiser extends BlockBase<BlockTypeClimatology> implements 
 		if (tile != null) {
 			TileHabitatformer former = tile.getFormer();
 			if (former != null) {
-				ParticleRender.addClimateParticles(world, pos, state, rand, former.getLogic().getCurrent());
+				ParticleRender.addClimateParticles(world, pos, rand, former);
 			}
 		}
 	}

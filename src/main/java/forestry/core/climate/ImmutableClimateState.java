@@ -45,7 +45,7 @@ class ImmutableClimateState implements IClimateState {
 		this.temperature = MathHelper.clamp(compound.getFloat(TEMPERATURE_NBT_KEY), 0.0F, 2.0F);
 		this.humidity = MathHelper.clamp(compound.getFloat(HUMIDITY_NBT_KEY), 0.0F, 2.0F);
 	}
-	
+
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		compound.setFloat(TEMPERATURE_NBT_KEY, temperature);
@@ -56,7 +56,7 @@ class ImmutableClimateState implements IClimateState {
 
 	@Override
 	public IClimateState copy(boolean mutable) {
-		return ClimateStates.INSTANCE.create(this, mutable);
+		return ClimateStateHelper.INSTANCE.create(this, mutable);
 	}
 
 	@Override
@@ -75,28 +75,28 @@ class ImmutableClimateState implements IClimateState {
 	}
 
 	@Override
-	public IClimateState addTemperature(float temperature){
-		return ClimateStates.of(this.temperature + temperature, humidity);
+	public IClimateState addTemperature(float temperature) {
+		return ClimateStateHelper.of(this.temperature + temperature, humidity);
 	}
-	
+
 	@Override
-	public IClimateState addHumidity(float humidity){
-		return ClimateStates.of(temperature, this.humidity + humidity);
+	public IClimateState addHumidity(float humidity) {
+		return ClimateStateHelper.of(temperature, this.humidity + humidity);
 	}
-	
+
 	@Override
-	public IClimateState add(IClimateState state){
-		return ClimateStates.of(this.temperature + state.getTemperature(), this.humidity + state.getHumidity());
+	public IClimateState add(IClimateState state) {
+		return ClimateStateHelper.of(this.temperature + state.getTemperature(), this.humidity + state.getHumidity());
 	}
 
 	@Override
 	public IClimateState scale(double factor) {
-		return ClimateStates.of((float) (this.temperature * factor), (float) (this.humidity * factor));
+		return ClimateStateHelper.of((float) (this.temperature * factor), (float) (this.humidity * factor));
 	}
 
 	@Override
-	public IClimateState remove(IClimateState state){
-		return ClimateStates.of(this.temperature - state.getTemperature(), this.humidity - state.getHumidity());
+	public IClimateState remove(IClimateState state) {
+		return ClimateStateHelper.of(this.temperature - state.getTemperature(), this.humidity - state.getHumidity());
 	}
 
 	@Override
@@ -113,28 +113,28 @@ class ImmutableClimateState implements IClimateState {
 	public float getTemperature() {
 		return temperature;
 	}
-	
+
 	@Override
 	public float getHumidity() {
 		return humidity;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
-		if(!(obj instanceof IClimateState)){
+		if (!(obj instanceof IClimateState)) {
 			return false;
 		}
 		IClimateState otherState = (IClimateState) obj;
 		return otherState.getTemperature() == temperature && otherState.getHumidity() == humidity;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return Float.hashCode(temperature) * 31 + Float.hashCode(humidity);
 	}
-	
-    @Override
+
+	@Override
 	public String toString() {
-        return MoreObjects.toStringHelper(this).add("temperature", temperature).add("humidity", humidity).toString();
-    }
+		return MoreObjects.toStringHelper(this).add("temperature", temperature).add("humidity", humidity).toString();
+	}
 }

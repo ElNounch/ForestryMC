@@ -32,9 +32,9 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import forestry.api.climate.ClimateCapabilities;
+import forestry.api.climate.IClimateHolder;
 import forestry.api.climate.IClimateState;
-import forestry.api.climatology.ClimateCapabilities;
-import forestry.api.climatology.IClimateHolder;
 import forestry.climatology.ModuleClimatology;
 import forestry.core.climate.AbsentClimateState;
 import forestry.core.items.IColoredItem;

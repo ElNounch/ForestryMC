@@ -25,11 +25,11 @@ import net.minecraft.world.biome.Biome;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import forestry.api.climate.IClimateLogic;
 import forestry.api.climate.IClimateState;
-import forestry.api.climatology.IClimateLogic;
 import forestry.api.core.ForestryAPI;
 import forestry.climatology.gui.GuiHabitatformer;
-import forestry.core.climate.ClimateStates;
+import forestry.core.climate.ClimateStateHelper;
 import forestry.core.gui.tooltips.ToolTip;
 import forestry.core.gui.widgets.Widget;
 import forestry.core.gui.widgets.WidgetManager;
@@ -108,7 +108,7 @@ public class WidgetHabitatBar extends Widget {
 		private String spriteName;
 
 		EnumClimate(String spriteName, Biome biome) {
-			climateState = ClimateStates.of(biome.getDefaultTemperature(), biome.getRainfall());
+			climateState = ClimateStateHelper.of(biome.getDefaultTemperature(), biome.getRainfall());
 			this.spriteName = spriteName;
 		}
 

@@ -38,7 +38,7 @@ class MutableClimateState implements IClimateState {
 
 	@Override
 	public IClimateState copy(boolean mutable) {
-		return ClimateStates.INSTANCE.create(this, mutable);
+		return ClimateStateHelper.INSTANCE.create(this, mutable);
 	}
 
 	@Override
@@ -57,36 +57,36 @@ class MutableClimateState implements IClimateState {
 	}
 
 	@Override
-	public IClimateState addTemperature(float temperature){
+	public IClimateState addTemperature(float temperature) {
 		this.temperature += temperature;
-		return ClimateStates.INSTANCE.checkState(this);
+		return ClimateStateHelper.INSTANCE.checkState(this);
 	}
 
 	@Override
-	public IClimateState addHumidity(float humidity){
+	public IClimateState addHumidity(float humidity) {
 		this.humidity += humidity;
-		return ClimateStates.INSTANCE.checkState(this);
+		return ClimateStateHelper.INSTANCE.checkState(this);
 	}
 
 	@Override
-	public IClimateState add(IClimateState state){
+	public IClimateState add(IClimateState state) {
 		this.humidity += state.getHumidity();
 		this.temperature += state.getTemperature();
-		return ClimateStates.INSTANCE.checkState(this);
+		return ClimateStateHelper.INSTANCE.checkState(this);
 	}
 
 	@Override
 	public IClimateState scale(double factor) {
 		this.humidity *= factor;
 		this.temperature *= factor;
-		return ClimateStates.INSTANCE.checkState(this);
+		return ClimateStateHelper.INSTANCE.checkState(this);
 	}
 
 	@Override
-	public IClimateState remove(IClimateState state){
+	public IClimateState remove(IClimateState state) {
 		this.humidity -= state.getHumidity();
 		this.temperature -= state.getTemperature();
-		return ClimateStates.INSTANCE.checkState(this);
+		return ClimateStateHelper.INSTANCE.checkState(this);
 	}
 
 	@Override
@@ -111,7 +111,7 @@ class MutableClimateState implements IClimateState {
 
 	@Override
 	public boolean equals(Object obj) {
-		if(!(obj instanceof IClimateState)){
+		if (!(obj instanceof IClimateState)) {
 			return false;
 		}
 		IClimateState otherState = (IClimateState) obj;

@@ -15,9 +15,9 @@ import java.io.IOException;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.BlockPos;
 
+import forestry.api.climate.IClimateHousing;
+import forestry.api.climate.IClimateLogic;
 import forestry.api.climate.IClimateState;
-import forestry.api.climatology.IClimateHousing;
-import forestry.api.climatology.IClimateLogic;
 import forestry.core.network.ForestryPacket;
 import forestry.core.network.IForestryPacketHandlerServer;
 import forestry.core.network.IForestryPacketServer;

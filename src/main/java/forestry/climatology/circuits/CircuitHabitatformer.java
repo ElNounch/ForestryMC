@@ -12,9 +12,9 @@ package forestry.climatology.circuits;
 
 import javax.annotation.Nullable;
 
-import forestry.api.climatology.source.IClimateSource;
-import forestry.api.climatology.source.IClimateSourceCircuitable;
-import forestry.api.climatology.source.IClimateSourceProxy;
+import forestry.api.climate.source.IClimateSource;
+import forestry.api.climate.source.IClimateSourceCircuitable;
+import forestry.api.climate.source.IClimateSourceProxy;
 import forestry.climatology.tiles.TileHabitatformer;
 import forestry.core.circuits.Circuit;
 

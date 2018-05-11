@@ -6,10 +6,10 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 
-import forestry.api.climatology.source.IClimateSource;
-import forestry.api.climatology.source.IClimateSourceProxy;
-import forestry.climatology.climate.ClimateLogic;
+import forestry.api.climate.source.IClimateSource;
+import forestry.api.climate.source.IClimateSourceProxy;
 import forestry.core.blocks.BlockBase;
+import forestry.core.climate.ClimateLogic;
 import forestry.core.tiles.AdjacentTileCache;
 
 public class AdjacentNodeCache implements AdjacentTileCache.ICacheListener {

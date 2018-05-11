@@ -14,8 +14,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 
 import forestry.api.climate.ClimateType;
+import forestry.api.climate.IClimateLogic;
 import forestry.api.climate.IClimateState;
-import forestry.api.climatology.IClimateLogic;
 import forestry.climatology.gui.widgets.WidgetClimateBar;
 import forestry.climatology.gui.widgets.WidgetHabitatBar;
 import forestry.climatology.network.packets.PacketSelectClimateTargeted;

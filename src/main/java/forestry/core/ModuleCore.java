@@ -50,7 +50,7 @@ import forestry.core.blocks.BlockRegistryCore;
 import forestry.core.blocks.EnumResourceType;
 import forestry.core.circuits.CircuitRegistry;
 import forestry.core.circuits.SolderManager;
-import forestry.core.climate.ClimateManager;
+import forestry.core.climate.EventHandlerClimate;
 import forestry.core.commands.CommandModules;
 import forestry.core.commands.RootCommand;
 import forestry.core.config.Config;
@@ -74,7 +74,6 @@ import forestry.core.render.TextureManagerForestry;
 import forestry.core.utils.ClimateUtil;
 import forestry.core.utils.ForestryModEnvWarningCallable;
 import forestry.core.utils.OreDictUtil;
-import forestry.core.utils.World2ObjectMap;
 import forestry.modules.BlankForestryModule;
 import forestry.modules.ForestryModuleUids;
 import forestry.modules.ModuleHelper;
@@ -122,9 +121,6 @@ public class ModuleCore extends BlankForestryModule {
 		LootFunctionManager.registerFunction(new SetSpeciesNBT.Serializer());
 
 		MultiblockManager.logicFactory = new MultiblockLogicFactory();
-		ForestryAPI.climateManager = ClimateManager.getInstance();
-		//TODO: Greenhouse Api
-		//ForestryAPI.climateFactory = new ClimateFactory();
 	}
 
 	@Override
@@ -139,7 +135,7 @@ public class ModuleCore extends BlankForestryModule {
 		GameProfileDataSerializer.register();
 
 		MinecraftForge.EVENT_BUS.register(this);
-		MinecraftForge.EVENT_BUS.register(World2ObjectMap.class);
+		MinecraftForge.EVENT_BUS.register(new EventHandlerClimate());
 
 		rootCommand.addChildCommand(new CommandModules());
 	}

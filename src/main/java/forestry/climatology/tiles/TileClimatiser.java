@@ -18,9 +18,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.nbt.NBTTagCompound;
 
-import forestry.api.climatology.source.IClimateSourceProxy;
+import forestry.api.climate.source.IClimateSourceProxy;
 import forestry.climatology.blocks.BlockClimatiser;
-import forestry.climatology.climate.source.ClimateSource;
+import forestry.climatology.climate.ClimateSource;
 import forestry.climatology.gui.ContainerHabitatformer;
 import forestry.climatology.gui.GuiHabitatformer;
 import forestry.core.blocks.BlockBase;

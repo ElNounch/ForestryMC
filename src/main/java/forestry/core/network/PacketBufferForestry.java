@@ -17,7 +17,7 @@ import net.minecraftforge.fluids.FluidStack;
 
 import forestry.api.climate.IClimateState;
 import forestry.core.climate.AbsentClimateState;
-import forestry.core.climate.ClimateStates;
+import forestry.core.climate.ClimateStateHelper;
 
 import io.netty.buffer.ByteBuf;
 
@@ -183,7 +183,7 @@ public class PacketBufferForestry extends PacketBuffer {
 
 	public IClimateState readClimateState(){
 		if(readBoolean()){
-			return ClimateStates.of(readFloat(), readFloat(), readBoolean());
+			return ClimateStateHelper.of(readFloat(), readFloat(), readBoolean());
 		}else{
 			return AbsentClimateState.INSTANCE;
 		}

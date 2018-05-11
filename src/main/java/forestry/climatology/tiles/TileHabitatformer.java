@@ -7,19 +7,20 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.biome.Biome;
 
 import forestry.api.circuits.ChipsetManager;
 import forestry.api.circuits.CircuitSocketType;
 import forestry.api.circuits.ICircuitBoard;
 import forestry.api.circuits.ICircuitSocketType;
-import forestry.api.climatology.IClimateHousing;
-import forestry.api.climatology.IClimateLogic;
+import forestry.api.climate.IClimateHousing;
+import forestry.api.climate.IClimateLogic;
 import forestry.api.core.EnumHumidity;
 import forestry.api.core.EnumTemperature;
-import forestry.climatology.climate.ClimateLogic;
 import forestry.climatology.gui.ContainerHabitatformer;
 import forestry.climatology.gui.GuiHabitatformer;
 import forestry.core.circuits.ISocketable;
+import forestry.core.climate.ClimateLogic;
 import forestry.core.inventory.InventoryAdapter;
 import forestry.core.network.PacketBufferForestry;
 import forestry.core.tiles.IClimatised;
@@ -89,6 +90,11 @@ public class TileHabitatformer extends TilePowered implements IClimateHousing, I
 	@Override
 	public EnumHumidity getHumidity() {
 		return EnumHumidity.getFromValue(getExactHumidity());
+	}
+
+	@Override
+	public Biome getBiome() {
+		return world.getBiome(getPos());
 	}
 
 	@Override

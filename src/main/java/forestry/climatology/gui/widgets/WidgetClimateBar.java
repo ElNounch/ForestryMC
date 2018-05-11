@@ -17,10 +17,10 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.TextureManager;
 
 import forestry.api.climate.ClimateType;
+import forestry.api.climate.IClimateLogic;
 import forestry.api.climate.IClimateState;
-import forestry.api.climatology.IClimateLogic;
 import forestry.climatology.gui.GuiHabitatformer;
-import forestry.core.climate.ClimateStates;
+import forestry.core.climate.ClimateStateHelper;
 import forestry.core.gui.tooltips.ToolTip;
 import forestry.core.gui.widgets.Widget;
 import forestry.core.gui.widgets.WidgetManager;
@@ -86,9 +86,9 @@ public class WidgetClimateBar extends Widget {
 		IClimateState climateState = former.getClimate();
 		IClimateState newState;
 		if (type == ClimateType.TEMPERATURE) {
-			newState = ClimateStates.of(value, climateState.getHumidity());
+			newState = ClimateStateHelper.of(value, climateState.getHumidity());
 		} else {
-			newState = ClimateStates.of(climateState.getTemperature(), value);
+			newState = ClimateStateHelper.of(climateState.getTemperature(), value);
 		}
 		former.setClimate(newState);
 	}
