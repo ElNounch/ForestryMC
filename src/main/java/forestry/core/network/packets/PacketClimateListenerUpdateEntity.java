@@ -46,7 +46,7 @@ public class PacketClimateListenerUpdateEntity extends ForestryPacket implements
 			if (entity != null && entity.hasCapability(ClimateCapabilities.CLIMATE_LISTENER, null)) {
 				IClimateListener listener = entity.getCapability(ClimateCapabilities.CLIMATE_LISTENER, null);
 				if (listener != null) {
-					listener.setClientState(state);
+					listener.setClimateState(state);
 				}
 			}
 		}

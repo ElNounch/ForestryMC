@@ -89,7 +89,7 @@ public class Forestry {
 		ForestryAPI.instance = this;
 		ForestryAPI.forestryConstants = new Constants();
 		ForestryAPI.errorStateRegistry = new ErrorStateRegistry();
-		ClimateManager.climateRoot = ClimateRoot.getInstance();
+		ClimateManager.climateRoot = ForestryAPI.climateManager= ClimateRoot.getInstance();
 		ClimateManager.climateFactory = ClimateFactory.INSTANCE;
 		ClimateManager.stateHelper = ClimateStateHelper.INSTANCE;
 		EnumErrorCode.init();

@@ -111,9 +111,12 @@ public class ParticleRender {
 	}
 
 	public static void addClimateParticles(World worldIn, BlockPos pos, Random rand, IClimateProvider provider){
+		if (!shouldSpawnParticle(worldIn)) {
+			return;
+		}
 		EnumTemperature temperature = provider.getTemperature();
-		if(rand.nextFloat() >= 0.85F) {
-			for (int i = 0; i < 5; i++) {
+		if(rand.nextFloat() >= 0.9F) {
+			for (int i = 0; i < 3; i++) {
 				EnumFacing facing = EnumFacing.HORIZONTALS[rand.nextInt(4)];
 				int xOffset = facing.getFrontOffsetX();
 				int zOffset = facing.getFrontOffsetZ();

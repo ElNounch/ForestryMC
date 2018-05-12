@@ -3,15 +3,14 @@ package forestry.core.network.packets;
 import java.io.IOException;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import forestry.api.climate.ClimateCapabilities;
 import forestry.api.climate.IClimateListener;
 import forestry.api.climate.IClimateState;
+import forestry.core.climate.ClimateRoot;
 import forestry.core.network.ForestryPacket;
 import forestry.core.network.IForestryPacketClient;
 import forestry.core.network.IForestryPacketHandlerClient;
@@ -44,12 +43,9 @@ public class PacketClimateListenerUpdate extends ForestryPacket implements IFore
 		public void onPacketData(PacketBufferForestry data, EntityPlayer player) throws IOException {
 			BlockPos pos = data.readBlockPos();
 			IClimateState state = data.readClimateState();
-			TileEntity tileEntity = player.world.getTileEntity(pos);
-			if (tileEntity != null && tileEntity.hasCapability(ClimateCapabilities.CLIMATE_LISTENER, null)) {
-				IClimateListener listener = tileEntity.getCapability(ClimateCapabilities.CLIMATE_LISTENER, null);
-				if (listener != null) {
-					listener.setClientState(state);
-				}
+			IClimateListener listener = ClimateRoot.getInstance().getListener(player.world, pos);
+			if (listener != null) {
+				listener.setClimateState(state);
 			}
 		}
 	}

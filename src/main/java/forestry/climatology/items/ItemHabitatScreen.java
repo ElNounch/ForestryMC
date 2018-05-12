@@ -27,16 +27,15 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
 
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import forestry.api.climate.ClimateCapabilities;
 import forestry.api.climate.IClimateHolder;
 import forestry.api.climate.IClimateState;
 import forestry.climatology.ModuleClimatology;
 import forestry.core.climate.AbsentClimateState;
+import forestry.core.climate.ClimateRoot;
 import forestry.core.items.IColoredItem;
 import forestry.core.items.ItemForestry;
 import forestry.core.utils.Translator;
@@ -111,14 +110,9 @@ public class ItemHabitatScreen extends ItemForestry implements IColoredItem {
 	@Override
 	public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
 		IClimateState state;
-		Chunk chunk = world.getChunkProvider().getLoadedChunk(pos.getX() >> 4, pos.getZ() >> 4);
-		if (chunk != null && chunk.hasCapability(ClimateCapabilities.CLIMATE_HOLDER, null)) {
-			IClimateHolder holder = chunk.getCapability(ClimateCapabilities.CLIMATE_HOLDER, null);
-			if (holder != null) {
-				state = holder.getState(pos);
-			} else {
-				state = AbsentClimateState.INSTANCE;
-			}
+		IClimateHolder holder = ClimateRoot.getInstance().getHolder(world, pos);
+		if (holder != null) {
+			state = holder.getState(pos);
 		} else {
 			state = AbsentClimateState.INSTANCE;
 		}

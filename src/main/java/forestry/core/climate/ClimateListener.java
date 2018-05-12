@@ -7,25 +7,23 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.IChunkProvider;
+import net.minecraft.world.biome.Biome;
 
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import forestry.api.climate.ClimateCapabilities;
-import forestry.api.climate.ClimateManager;
 import forestry.api.climate.IClimateHolder;
 import forestry.api.climate.IClimateListener;
 import forestry.api.climate.IClimateProvider;
 import forestry.api.climate.IClimateState;
-import forestry.api.core.ForestryAPI;
+import forestry.api.core.BiomeHelper;
+import forestry.api.core.EnumHumidity;
+import forestry.api.core.EnumTemperature;
 import forestry.api.core.ILocatable;
 import forestry.core.network.packets.PacketClimateListenerUpdate;
 import forestry.core.network.packets.PacketClimateListenerUpdateEntity;
 import forestry.core.network.packets.PacketClimateListenerUpdateEntityRequest;
 import forestry.core.network.packets.PacketClimateListenerUpdateRequest;
-import forestry.core.render.ParticleRender;
 import forestry.core.utils.NetworkUtil;
 import forestry.core.utils.TickHelper;
 
@@ -34,11 +32,13 @@ public class ClimateListener implements IClimateListener {
 
 	private final Object locationProvider;
 	@Nullable
+	protected World world;
+	@Nullable
+	protected BlockPos pos;
+	@Nullable
 	private IClimateHolder holder = null;
-	private IClimateState cachedState = ClimateManager.stateHelper.absent();
-	private IClimateState cachedClientState = ClimateManager.stateHelper.absent();
-	@SideOnly(Side.CLIENT)
-	private IClimateState clientState = ClimateManager.stateHelper.absent();
+	private IClimateState cachedState = AbsentClimateState.INSTANCE;
+	private IClimateState cachedClientState = AbsentClimateState.INSTANCE;
 	@SideOnly(Side.CLIENT)
 	private TickHelper tickHelper = new TickHelper();
 	@SideOnly(Side.CLIENT)
@@ -46,10 +46,6 @@ public class ClimateListener implements IClimateListener {
 	//The total world time at the moment the cached state has been updated
 	private long cacheTime = 0;
 	private long lastUpdate = 0;
-	@Nullable
-	protected World world;
-	@Nullable
-	protected BlockPos pos;
 
 	public ClimateListener(Object locationProvider) {
 		this.locationProvider = locationProvider;
@@ -59,12 +55,10 @@ public class ClimateListener implements IClimateListener {
 	@Override
 	public void updateClientSide() {
 		tickHelper.onTick();
-		if (clientState.isPresent()) {
-			if (tickHelper.updateOnInterval(10)) {
-				World worldObj = getWorldObj();
-				BlockPos coordinates = getCoordinates();
-				ParticleRender.addClimateParticles(worldObj, coordinates, worldObj.rand, getProvider());
-			}
+		if (cachedState.isPresent() && tickHelper.updateOnInterval(10)) {
+			World worldObj = getWorldObj();
+			BlockPos coordinates = getCoordinates();
+			//ParticleRender.addClimateParticles(worldObj, coordinates, worldObj.rand, this);
 		}
 		if (needsClimateUpdate) {
 			if (locationProvider instanceof Entity) {
@@ -76,25 +70,10 @@ public class ClimateListener implements IClimateListener {
 		}
 	}
 
-	private IClimateProvider getProvider() {
-		IClimateProvider provider;
-		if (locationProvider instanceof IClimateProvider) {
-			provider = (IClimateProvider) locationProvider;
-		} else {
-			provider = ForestryAPI.climateManager.getDefaultClimate(getWorldObj(), getCoordinates());
-		}
-		return new ExtendedClimateProvider(clientState, provider);
-	}
-
 	@Nullable
 	private IClimateHolder getHolder() {
 		if (holder == null) {
-			IChunkProvider chunkProvider = getWorldObj().getChunkProvider();
-			BlockPos coordinates = getCoordinates();
-			Chunk chunk = chunkProvider.getLoadedChunk(coordinates.getX() >> 4, coordinates.getZ() >> 4);
-			if (chunk != null) {
-				holder = chunk.getCapability(ClimateCapabilities.CLIMATE_HOLDER, null);
-			}
+			holder = ClimateRoot.getInstance().getHolder(getWorldObj(), getCoordinates());
 		}
 		return holder;
 	}
@@ -119,25 +98,72 @@ public class ClimateListener implements IClimateListener {
 	@Override
 	public IClimateState getState(boolean update, boolean syncToClient) {
 		World worldObj = getWorldObj();
-		if (worldObj.isRemote) {
-			return getClientState();
-		}
-		if (update) {
+		if (!worldObj.isRemote && update) {
 			updateState(syncToClient);
 		}
 		return cachedState;
 	}
 
-	@SideOnly(Side.CLIENT)
+	private IClimateProvider getDefaultProvider() {
+		IClimateProvider provider;
+		if (locationProvider instanceof IClimateProvider) {
+			provider = (IClimateProvider) locationProvider;
+		} else {
+			provider = ClimateRoot.getInstance().getDefaultClimate(getWorldObj(), getCoordinates());
+		}
+		return provider;
+	}
+
 	@Override
-	public void setClientState(IClimateState clientState) {
-		this.clientState = clientState;
+	public Biome getBiome() {
+		IClimateProvider provider = getDefaultProvider();
+		return provider.getBiome();
+	}
+
+	@Override
+	public EnumTemperature getTemperature() {
+		Biome biome = getBiome();
+		if (BiomeHelper.isBiomeHellish(biome)) {
+			return EnumTemperature.HELLISH;
+		}
+		return EnumTemperature.getFromValue(getExactTemperature());
+	}
+
+	@Override
+	public EnumHumidity getHumidity() {
+		return EnumHumidity.getFromValue(getExactTemperature());
+	}
+
+	@Override
+	public float getExactTemperature() {
+		IClimateState climateState = getState();
+		float temperature;
+		if (climateState.isPresent()) {
+			temperature = climateState.getTemperature();
+		} else {
+			Biome biome = getBiome();
+			temperature = biome.getTemperature(getCoordinates());
+		}
+		return temperature;
+	}
+
+	@Override
+	public float getExactHumidity() {
+		IClimateState climateState = getState();
+		float humidity;
+		if (climateState.isPresent()) {
+			humidity = climateState.getHumidity();
+		} else {
+			Biome biome = getBiome();
+			humidity = biome.getRainfall();
+		}
+		return humidity;
 	}
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public IClimateState getClientState() {
-		return clientState;
+	public void setClimateState(IClimateState climateState) {
+		this.cachedState = climateState;
 	}
 
 	@Override
@@ -152,7 +178,7 @@ public class ClimateListener implements IClimateListener {
 					NetworkUtil.sendNetworkPacket(new PacketClimateListenerUpdate(getCoordinates(), cachedState), coordinates, getWorldObj());
 				}
 			}
-			cachedClientState = clientState;
+			cachedClientState = cachedState;
 		}
 	}
 
@@ -160,10 +186,11 @@ public class ClimateListener implements IClimateListener {
 	public void syncToClient(EntityPlayerMP player) {
 		World worldObj = getWorldObj();
 		if (!worldObj.isRemote) {
+			IClimateState climateState = getState(true, false);
 			if (locationProvider instanceof Entity) {
-				NetworkUtil.sendToPlayer(new PacketClimateListenerUpdateEntity((Entity) locationProvider, getState(true, false)), player);
+				NetworkUtil.sendToPlayer(new PacketClimateListenerUpdateEntity((Entity) locationProvider, climateState), player);
 			} else {
-				NetworkUtil.sendToPlayer(new PacketClimateListenerUpdate(getCoordinates(), getState(true, false)), player);
+				NetworkUtil.sendToPlayer(new PacketClimateListenerUpdate(getCoordinates(), climateState), player);
 			}
 		}
 	}

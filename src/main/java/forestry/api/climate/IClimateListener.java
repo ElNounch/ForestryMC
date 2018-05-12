@@ -6,8 +6,9 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import forestry.api.core.ILocatable;
+import forestry.core.tiles.IClimatised;
 
-public interface IClimateListener extends ILocatable {
+public interface IClimateListener extends ILocatable, IClimateProvider, IClimatised {
 	default IClimateState getState() {
 		return getState(true);
 	}
@@ -23,10 +24,7 @@ public interface IClimateListener extends ILocatable {
 	void updateClientSide();
 
 	@SideOnly(Side.CLIENT)
-	void setClientState(IClimateState clientState);
-
-	@SideOnly(Side.CLIENT)
-	IClimateState getClientState();
+	void setClimateState(IClimateState climateState);
 
 	void syncToClient();
 

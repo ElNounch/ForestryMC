@@ -18,7 +18,6 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 
 import net.minecraftforge.fml.common.SidedProxy;
@@ -50,7 +49,6 @@ import forestry.core.circuits.CircuitLayout;
 import forestry.core.circuits.Circuits;
 import forestry.core.circuits.EnumCircuitBoardType;
 import forestry.core.climate.ClimateHolder;
-import forestry.core.climate.EventHandlerClimate;
 import forestry.core.climate.FakeClimateListener;
 import forestry.core.climate.FakeClimateTransformer;
 import forestry.core.config.Constants;
@@ -100,7 +98,6 @@ public class ModuleClimatology extends BlankForestryModule {
 	@Override
 	public void preInit() {
 		proxy.preInti();
-		MinecraftForge.EVENT_BUS.register(new EventHandlerClimate());
 		proxy.initializeModels();
 
 		ICircuitLayout layoutManaged = new CircuitLayout("habitat.former", CircuitSocketType.HABITAT_FORMER);

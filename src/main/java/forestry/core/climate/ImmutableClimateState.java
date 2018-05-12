@@ -101,7 +101,7 @@ class ImmutableClimateState implements IClimateState {
 
 	@Override
 	public boolean isPresent() {
-		return !Float.isNaN(temperature) && !Float.isNaN(humidity);
+		return true;
 	}
 
 	@Override

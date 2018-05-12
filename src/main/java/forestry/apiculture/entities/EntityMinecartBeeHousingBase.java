@@ -42,7 +42,6 @@ import forestry.core.owner.IOwnedTile;
 import forestry.core.owner.IOwnerHandler;
 import forestry.core.owner.OwnerHandler;
 import forestry.core.tiles.IClimatised;
-import forestry.core.utils.ClimateUtil;
 import forestry.core.utils.NetworkUtil;
 import forestry.core.utils.TickHelper;
 
@@ -103,7 +102,7 @@ public abstract class EntityMinecartBeeHousingBase extends EntityMinecartContain
 
 	@Override
 	public EnumTemperature getTemperature() {
-		return EnumTemperature.getFromBiome(getBiome(), world, getPosition());
+		return EnumTemperature.getFromBiome(getBiome(), getPosition());
 	}
 
 	@Override
@@ -113,12 +112,12 @@ public abstract class EntityMinecartBeeHousingBase extends EntityMinecartContain
 
 	@Override
 	public float getExactTemperature() {
-		return ClimateUtil.getTemperature(world, getPosition());
+		return getBiome().getTemperature(getPosition());
 	}
 
 	@Override
 	public float getExactHumidity() {
-		return ClimateUtil.getHumidity(world, getPosition());
+		return getBiome().getRainfall();
 	}
 
 	@Override

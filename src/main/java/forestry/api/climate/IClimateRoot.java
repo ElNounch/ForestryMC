@@ -1,5 +1,7 @@
 package forestry.api.climate;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -9,17 +11,18 @@ import net.minecraft.world.World;
 public interface IClimateRoot {
 
 	/**
-	 * Gets the current state of a container at this position or setSettings one with the datas from the biome.
+	 * @return the lister at the given position in the given world if there is any.
 	 */
-	IClimateState getClimateState(World world, BlockPos pos);
+	@Nullable
+	IClimateListener getListener(World world, BlockPos pos);
+
+	@Nullable
+	IClimateHolder getHolder(World world, BlockPos pos);
+
+	IClimateState getBiomeState(World worldObj, BlockPos coordinates);
 
 	/**
-	 * Creates a climate state with the help of the biome on this position.
-	 */
-	IClimateState getBiomeState(World world, BlockPos pos);
-
-	/**
-	 * @return Create a climate manager.
+	 * @return Create a climate provider.
 	 */
 	IClimateProvider getDefaultClimate(World world, BlockPos pos);
 }

@@ -10,9 +10,9 @@
  ******************************************************************************/
 package forestry.core.climate;
 
-import java.util.HashMap;
-import java.util.Map;
+import javax.annotation.Nullable;
 
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -20,6 +20,7 @@ import net.minecraft.world.chunk.Chunk;
 
 import forestry.api.climate.ClimateCapabilities;
 import forestry.api.climate.IClimateHolder;
+import forestry.api.climate.IClimateListener;
 import forestry.api.climate.IClimateManager;
 import forestry.api.climate.IClimateProvider;
 import forestry.api.climate.IClimateState;
@@ -29,38 +30,28 @@ public class ClimateRoot implements IClimateManager {
 
 	private static final ClimateRoot INSTANCE = new ClimateRoot();
 
-	private static final Map<Biome, IClimateState> BIOME_STATES = new HashMap<>();
-
 	public static ClimateRoot getInstance() {
 		return INSTANCE;
 	}
 
+	@Nullable
 	@Override
-	public IClimateState getBiomeState(World world, BlockPos pos) {
-		Biome biome = world.getBiome(pos);
-		return getBiomeState(biome);
-	}
-
-	private IClimateState getBiomeState(Biome biome) {
-		if (!BIOME_STATES.containsKey(biome)) {
-			BIOME_STATES.put(biome, ClimateStateHelper.of(biome.getDefaultTemperature(), biome.getRainfall()));
-		}
-		return BIOME_STATES.get(biome);
-	}
-
-	@Override
-	public IClimateState getClimateState(World world, BlockPos pos) {
+	public IClimateHolder getHolder(World world, BlockPos pos) {
 		Chunk chunk = world.getChunkProvider().getLoadedChunk(pos.getX() >> 4, pos.getZ() >> 4);
 		if (chunk != null && chunk.hasCapability(ClimateCapabilities.CLIMATE_HOLDER, null)) {
-			IClimateHolder holder = chunk.getCapability(ClimateCapabilities.CLIMATE_HOLDER, null);
-			if (holder != null) {
-				IClimateState state = holder.getState(pos);
-				if (state.isPresent()) {
-					return state;
-				}
-			}
+			return chunk.getCapability(ClimateCapabilities.CLIMATE_HOLDER, null);
 		}
-		return getBiomeState(world, pos);
+		return null;
+	}
+
+	@Nullable
+	@Override
+	public IClimateListener getListener(World world, BlockPos pos) {
+		TileEntity tileEntity = world.getTileEntity(pos);
+		if (tileEntity != null && tileEntity.hasCapability(ClimateCapabilities.CLIMATE_LISTENER, null)) {
+			return tileEntity.getCapability(ClimateCapabilities.CLIMATE_LISTENER, null);
+		}
+		return null;
 	}
 
 	@Override
@@ -68,4 +59,8 @@ public class ClimateRoot implements IClimateManager {
 		return new DefaultClimateProvider(world, pos);
 	}
 
+	public IClimateState getBiomeState(World worldObj, BlockPos coordinates) {
+		Biome biome = worldObj.getBiome(coordinates);
+		return ClimateStateHelper.of(biome.getTemperature(coordinates), biome.getRainfall());
+	}
 }

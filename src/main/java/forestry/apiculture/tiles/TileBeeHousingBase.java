@@ -30,7 +30,6 @@ import forestry.api.apiculture.BeeManager;
 import forestry.api.apiculture.IBeeHousing;
 import forestry.api.apiculture.IBeekeepingLogic;
 import forestry.api.climate.ClimateCapabilities;
-import forestry.api.climate.IClimateState;
 import forestry.api.core.EnumHumidity;
 import forestry.api.core.EnumTemperature;
 import forestry.apiculture.gui.IGuiBeeHousingDelegate;
@@ -43,7 +42,6 @@ import forestry.core.owner.OwnerHandler;
 import forestry.core.render.ParticleRender;
 import forestry.core.tiles.IClimatised;
 import forestry.core.tiles.TileBase;
-import forestry.core.utils.ClimateUtil;
 
 public abstract class TileBeeHousingBase extends TileBase implements IBeeHousing, IOwnedTile, IClimatised, IGuiBeeHousingDelegate, IStreamableGui {
 	private final String hintKey;
@@ -111,30 +109,22 @@ public abstract class TileBeeHousingBase extends TileBase implements IBeeHousing
 	/* ICLIMATISED */
 	@Override
 	public EnumTemperature getTemperature() {
-		return EnumTemperature.getFromBiome(getBiome(), world, getPos());
+		return climateListener.getTemperature();
 	}
 
 	@Override
 	public EnumHumidity getHumidity() {
-		return EnumHumidity.getFromValue(getExactHumidity());
+		return climateListener.getHumidity();
 	}
 
 	@Override
 	public float getExactTemperature() {
-		IClimateState personalState = climateListener.getState();
-		if(personalState.isPresent()){
-			return personalState.getTemperature();
-		}
-		return ClimateUtil.getTemperature(world, getPos());
+		return climateListener.getExactTemperature();
 	}
 
 	@Override
 	public float getExactHumidity() {
-		IClimateState personalState = climateListener.getState();
-		if(personalState.isPresent()){
-			return personalState.getHumidity();
-		}
-		return ClimateUtil.getHumidity(world, getPos());
+		return climateListener.getExactHumidity();
 	}
 
 	/* ClimateListener */

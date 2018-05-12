@@ -7,13 +7,10 @@ package forestry.api.core;
 
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import forestry.api.climate.IClimateState;
 
 /**
  * Many things Forestry use temperature and humidity of a biome to determine whether they can or how they can work or spawn at a given location.
@@ -74,18 +71,11 @@ public enum EnumTemperature {
 		return getFromValue(biome.getDefaultTemperature());
 	}
 
-	public static EnumTemperature getFromBiome(Biome biome, World world, BlockPos pos) {
+	public static EnumTemperature getFromBiome(Biome biome, BlockPos pos) {
 		if (BiomeHelper.isBiomeHellish(biome)) {
 			return HELLISH;
 		}
-		return getFromState(biome, ForestryAPI.climateManager.getClimateState(world, pos));
-	}
-
-	public static EnumTemperature getFromState(Biome biome, IClimateState state){
-		if (BiomeHelper.isBiomeHellish(biome)) {
-			return HELLISH;
-		}
-		float temperature = state.getTemperature();
+		float temperature = biome.getTemperature(pos);
 		return getFromValue(temperature);
 	}
 }
