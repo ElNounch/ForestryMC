@@ -12,9 +12,6 @@ package forestry.climatology.circuits;
 
 import javax.annotation.Nullable;
 
-import forestry.api.climate.source.IClimateSource;
-import forestry.api.climate.source.IClimateSourceCircuitable;
-import forestry.api.climate.source.IClimateSourceProxy;
 import forestry.climatology.tiles.TileHabitatformer;
 import forestry.core.circuits.Circuit;
 
@@ -37,15 +34,11 @@ public class CircuitHabitatformer extends Circuit {
 
 	@Override
 	public void onInsertion(int slot, Object tile) {
-		IClimateSourceProxy<?> proxy = getCircuitable(tile);
-		if (proxy == null) {
+		TileHabitatformer habitatformer = getCircuitable(tile);
+		if(habitatformer == null){
 			return;
 		}
-		IClimateSource source = proxy.getNode();
-		if (!(source instanceof IClimateSourceCircuitable)) {
-			return;
-		}
-		//((IClimateSourceCircuitable) source).changeSourceConfig(type, changeChange, rangeChange, energyChange);
+		habitatformer.changeClimateConfig(changeChange, rangeChange, energyChange);
 	}
 
 	@Override
@@ -55,27 +48,22 @@ public class CircuitHabitatformer extends Circuit {
 
 	@Override
 	public void onRemoval(int slot, Object tile) {
-		IClimateSourceProxy<?> proxy = getCircuitable(tile);
-		if (proxy == null) {
+		TileHabitatformer habitatformer = getCircuitable(tile);
+		if(habitatformer == null){
 			return;
 		}
-		IClimateSource source = proxy.getNode();
-		if (!(source instanceof IClimateSourceCircuitable)) {
-			return;
-		}
-		//((IClimateSourceCircuitable) source).changeSourceConfig(type, -changeChange, -rangeChange, -energyChange);
+		habitatformer.changeClimateConfig(-changeChange, -rangeChange, -energyChange);
 	}
 
 	@Override
 	public void onTick(int slot, Object tile) {
-
 	}
 
 	@Nullable
-	private IClimateSourceProxy getCircuitable(Object tile) {
+	private TileHabitatformer getCircuitable(Object tile) {
 		if (!isCircuitable(tile)) {
 			return null;
 		}
-		return (IClimateSourceProxy) tile;
+		return (TileHabitatformer) tile;
 	}
 }

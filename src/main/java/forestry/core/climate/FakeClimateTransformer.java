@@ -18,6 +18,21 @@ public class FakeClimateTransformer implements IClimateTransformer {
 	}
 
 	@Override
+	public float getResourceModifier() {
+		return 0;
+	}
+
+	@Override
+	public float getChangeModifier() {
+		return 0;
+	}
+
+	@Override
+	public float getRangeModifier() {
+		return 0;
+	}
+
+	@Override
 	public IClimateState getTarget() {
 		return ClimateStateHelper.INSTANCE.absent();
 	}

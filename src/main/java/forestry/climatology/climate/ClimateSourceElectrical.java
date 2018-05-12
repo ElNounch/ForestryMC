@@ -17,11 +17,10 @@ import forestry.api.climate.IClimateState;
 import forestry.api.core.IErrorLogic;
 import forestry.climatology.tiles.TileElectricalClimatiser;
 import forestry.core.climate.ClimateStateHelper;
-import forestry.core.config.Config;
 import forestry.core.errors.EnumErrorCode;
 import forestry.energy.EnergyManager;
 
-public class ClimateSourceElectrical extends ClimateSourceCircuitable<TileElectricalClimatiser> {
+public class ClimateSourceElectrical extends ClimateSource<TileElectricalClimatiser> {
 
 	private static final int ENERGY_PER_OPERATION = 75;
 
@@ -40,11 +39,11 @@ public class ClimateSourceElectrical extends ClimateSourceCircuitable<TileElectr
 	}
 
 	@Override
-	public boolean canWork(IClimateState currentState, @Nullable ClimateSourceType oppositeType) {
+	public boolean canWork(IClimateState currentState, @Nullable ClimateSourceType oppositeType, float resourceModifier) {
 		IErrorLogic errorLogic = proxy.getErrorLogic();
 		EnergyManager energyManager = proxy.getEnergyManager();
 
-		if (energyManager.extractEnergy((int) (ENERGY_PER_OPERATION * getEnergyModifier(currentState, oppositeType)), true) > 0) {
+		if (energyManager.extractEnergy(Math.round(ENERGY_PER_OPERATION * getEnergyModifier(currentState, oppositeType) * resourceModifier), true) > 0) {
 			proxy.setActive(true);
 			errorLogic.setCondition(false, EnumErrorCode.NO_POWER);
 			return true;
@@ -55,24 +54,10 @@ public class ClimateSourceElectrical extends ClimateSourceCircuitable<TileElectr
 	}
 
 	@Override
-	protected void removeResources(IClimateState currentState, @Nullable ClimateSourceType oppositeType) {
+	protected void removeResources(IClimateState currentState, @Nullable ClimateSourceType oppositeType, float resourceModifier) {
 		EnergyManager energyManager = proxy.getEnergyManager();
 
-		energyManager.extractEnergy((int) (ENERGY_PER_OPERATION * getEnergyModifier(currentState, oppositeType)), false);
-	}
-
-	private float getEnergyModifier(IClimateState currentState, @Nullable ClimateSourceType oppositeType) {
-		float change;
-		if (oppositeType != null) {
-			if (oppositeType.canChangeTemperature()) {
-				change = currentState.getTemperature();
-			} else {
-				change = currentState.getHumidity();
-			}
-		} else {
-			change = 0.0F;
-		}
-		return (1.0F + change) * Config.climateSourceEnergyModifier * energyChange;
+		energyManager.extractEnergy(Math.round(ENERGY_PER_OPERATION * getEnergyModifier(currentState, oppositeType) * resourceModifier), false);
 	}
 
 	@Override

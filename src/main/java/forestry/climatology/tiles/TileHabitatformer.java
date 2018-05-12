@@ -201,4 +201,8 @@ public class TileHabitatformer extends TilePowered implements IClimateHousing, I
 			}
 		}
 	}
+
+	public void changeClimateConfig(float changeChange, float rangeChange, float energyChange) {
+		logic.changeClimateConfig(changeChange, rangeChange, energyChange);
+	}
 }

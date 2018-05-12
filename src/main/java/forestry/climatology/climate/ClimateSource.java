@@ -20,6 +20,7 @@ import forestry.api.climate.IClimateState;
 import forestry.api.climate.source.IClimateSource;
 import forestry.api.climate.source.IClimateSourceProxy;
 import forestry.core.climate.ClimateStateHelper;
+import forestry.core.config.Config;
 
 public abstract class ClimateSource<P extends IClimateSourceProxy> implements IClimateSource<P> {
 
@@ -69,6 +70,20 @@ public abstract class ClimateSource<P extends IClimateSourceProxy> implements IC
 		return 0;
 	}
 
+	protected float getEnergyModifier(IClimateState currentState, @Nullable ClimateSourceType oppositeType) {
+		float change;
+		if (oppositeType != null) {
+			if (oppositeType.canChangeTemperature()) {
+				change = currentState.getTemperature();
+			} else {
+				change = currentState.getHumidity();
+			}
+		} else {
+			change = 0.0F;
+		}
+		return (1.0F + change) * Config.habitatformerResourceModifier;
+	}
+
 	protected float getBoundModifier(ClimateType type) {
 		return boundModifier;
 	}
@@ -95,7 +110,7 @@ public abstract class ClimateSource<P extends IClimateSourceProxy> implements IC
 		ClimateSourceType validType = getWorkType(currentState, targetState);
 		ClimateSourceType oppositeType = getOppositeWorkType(currentState, defaultState);
 		beforeWork();
-		boolean work = canWork(newState, oppositeType);
+		boolean work = canWork(newState, oppositeType, logic.getResourceModifier());
 		//Test if the source can work and test if the owner has enough resources to work.
 		if (!work && oppositeType != null) {
 			isActive = false;
@@ -109,20 +124,20 @@ public abstract class ClimateSource<P extends IClimateSourceProxy> implements IC
 				return newChange;
 			}
 			//If the state is not already zero, remove one change state from the state.
-			newChange = getChange(oppositeType, defaultState, currentState);
+			newChange = getChange(oppositeType, defaultState, currentState).scale(logic.getChangeModifier());
 			newChange = ClimateStateHelper.INSTANCE.create(-newChange.getTemperature(), -newChange.getHumidity());
 		} else if (validType != null) {
-			newChange = getChange(validType, targetState, previousState);
+			newChange = getChange(validType, targetState, previousState).scale(logic.getChangeModifier());
 			IClimateState changedState = newState.add(newChange);
-			boolean couldWork = canWork(changedState, oppositeType);
+			boolean couldWork = canWork(changedState, oppositeType, logic.getResourceModifier());
 			//Test if the owner could work with the changed state. If he can remove the resources for the changed state, if not only remove the resources for the old state.
-			removeResources(couldWork ? changedState : newState, oppositeType);
+			removeResources(couldWork ? changedState : newState, oppositeType, logic.getResourceModifier());
 			if (!couldWork) {
 				newChange = ClimateStateHelper.ZERO_STATE;
 			}
 		} else if (oppositeType != null) {
 			//Remove the resources if the owner has enough resources and the state is not the default state.
-			removeResources(newState, oppositeType);
+			removeResources(newState, oppositeType, logic.getResourceModifier());
 		}
 		newState = newState.add(newChange);
 		if (ClimateStateHelper.isZero(newState) || ClimateStateHelper.isNearZero(newState)) {
@@ -142,9 +157,9 @@ public abstract class ClimateSource<P extends IClimateSourceProxy> implements IC
 	/**
 	 * @return true if the source can work, false if it can not.
 	 */
-	protected abstract boolean canWork(IClimateState currentState, @Nullable ClimateSourceType oppositeType);
+	protected abstract boolean canWork(IClimateState currentState, @Nullable ClimateSourceType oppositeType, float resourceModifier);
 
-	protected abstract void removeResources(IClimateState currentState, @Nullable ClimateSourceType oppositeType);
+	protected abstract void removeResources(IClimateState currentState, @Nullable ClimateSourceType oppositeType, float resourceModifier);
 
 	protected abstract IClimateState getChange(ClimateSourceType type, IClimateState target, IClimateState currentState);
 

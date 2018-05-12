@@ -41,6 +41,7 @@ public class ClimateLogic implements IClimateLogic, IStreamable {
 	protected final IClimateHousing housing;
 	//All climate sources of this logic.
 	protected final Set<IClimateSource> sources;
+	private final ClimateConfig climateConfig;
 	//The state that this logic targets to reach.
 	private IClimateState targetedState;
 	//The current climate state of this logic.
@@ -68,6 +69,7 @@ public class ClimateLogic implements IClimateLogic, IStreamable {
 		this.chunks = new long[0];
 		this.radius = DEFAULT_BLOCK_RADIUS;
 		this.active = false;
+		this.climateConfig = new ClimateConfig();
 	}
 
 	@Override
@@ -251,7 +253,25 @@ public class ClimateLogic implements IClimateLogic, IStreamable {
 
 	@Override
 	public int getRadius() {
-		return radius;
+		return Math.round(radius * getRangeModifier());
+	}
+
+	public float getResourceModifier(){
+		return climateConfig.energyChange;
+	}
+
+	public float getChangeModifier(){
+		return climateConfig.changeChange;
+	}
+
+	public float getRangeModifier(){
+		return climateConfig.rangeChange;
+	}
+
+	public void changeClimateConfig(float changeChange, float rangeChange, float energyChange) {
+		climateConfig.changeChange+=changeChange;
+		climateConfig.rangeChange+=rangeChange;
+		climateConfig.energyChange+=energyChange;
 	}
 
 	private static class Vector {
@@ -274,5 +294,11 @@ public class ClimateLogic implements IClimateLogic, IStreamable {
 		private long toChunkPos() {
 			return ChunkPos.asLong((int) x, (int) z);
 		}
+	}
+
+	private static class ClimateConfig{
+		float changeChange = 1.0F;
+		float rangeChange = 1.0F;
+		float energyChange = 1.0F;
 	}
 }

@@ -14,7 +14,6 @@ import javax.annotation.Nullable;
 
 import net.minecraftforge.fluids.FluidStack;
 
-import forestry.api.climate.ClimateType;
 import forestry.api.climate.IClimateState;
 import forestry.api.core.IErrorLogic;
 import forestry.climatology.tiles.TileHygroregulator;
@@ -23,7 +22,7 @@ import forestry.core.errors.EnumErrorCode;
 import forestry.core.fluids.FilteredTank;
 import forestry.core.recipes.HygroregulatorRecipe;
 
-public class ClimateSourceHygroregulator extends ClimateSourceCircuitable<TileHygroregulator> {
+public class ClimateSourceHygroregulator extends ClimateSource<TileHygroregulator> {
 
 	@Nullable
 	private HygroregulatorRecipe currentRecipe;
@@ -60,11 +59,11 @@ public class ClimateSourceHygroregulator extends ClimateSourceCircuitable<TileHy
 	}
 
 	@Override
-	public boolean canWork(IClimateState currentState, @Nullable ClimateSourceType oppositeType) {
+	public boolean canWork(IClimateState currentState, @Nullable ClimateSourceType oppositeType, float resourceModifier) {
 		createRecipe();
 		FilteredTank liquidTank = proxy.getLiquidTank();
 		IErrorLogic errorLogic = proxy.getErrorLogic();
-		if (currentRecipe != null && liquidTank.drainInternal(currentRecipe.liquid.amount, false) != null) {
+		if (currentRecipe != null && liquidTank.drainInternal(Math.round(currentRecipe.liquid.amount * getEnergyModifier(currentState, oppositeType) * resourceModifier), false) != null) {
 			errorLogic.setCondition(false, EnumErrorCode.NO_RESOURCE_LIQUID);
 			proxy.setActive(true);
 			return true;
@@ -75,12 +74,12 @@ public class ClimateSourceHygroregulator extends ClimateSourceCircuitable<TileHy
 	}
 
 	@Override
-	protected void removeResources(IClimateState currentState, @Nullable ClimateSourceType oppositeType) {
+	protected void removeResources(IClimateState currentState, @Nullable ClimateSourceType oppositeType, float resourceModifier) {
 		if (currentRecipe == null) {
 			return;
 		}
 		FilteredTank liquidTank = proxy.getLiquidTank();
-		liquidTank.drainInternal(currentRecipe.liquid.amount, true);
+		liquidTank.drainInternal(Math.round(currentRecipe.liquid.amount * getEnergyModifier(currentState, oppositeType) * resourceModifier), true);
 	}
 
 	@Override
@@ -91,10 +90,10 @@ public class ClimateSourceHygroregulator extends ClimateSourceCircuitable<TileHy
 		float temperature = 0.0F;
 		float humidity = 0.0F;
 		if (type.canChangeHumidity()) {
-			humidity += currentRecipe.humidChange * getChangeMultiplier(ClimateType.HUMIDITY);
+			humidity += currentRecipe.humidChange;
 		}
 		if (type.canChangeTemperature()) {
-			temperature += currentRecipe.tempChange * getChangeMultiplier(ClimateType.TEMPERATURE);
+			temperature += currentRecipe.tempChange;
 		}
 		return ClimateStateHelper.mutableOf(temperature, humidity);
 	}

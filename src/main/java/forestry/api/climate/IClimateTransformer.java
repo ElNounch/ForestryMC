@@ -7,6 +7,12 @@ import forestry.api.core.ILocatable;
 public interface IClimateTransformer extends ILocatable {
 	int getRadius();
 
+	float getResourceModifier();
+
+	float getChangeModifier();
+
+	float getRangeModifier();
+
 	IClimateState getTarget();
 
 	IClimateState getCurrent();
