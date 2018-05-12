@@ -55,14 +55,27 @@ for.circuit.machine.speed.boost.2.description.1=Increases Speed by 25%
 for.circuit.machine.speed.boost.2.description.2=Increases Power Use by 10%
 for.circuit.machine.efficiency.1=Machine Efficiency
 for.circuit.machine.efficiency.1.description.1=Decreases Power Use by 10%
-for.circuit.climatiser.temperature.1=Temperature Boost I
-for.circuit.climatiser.temperature.1.description.1=Increases Range and Change by 12.5%
-for.circuit.climatiser.temperature.2=Temperature Boost II
-for.circuit.climatiser.temperature.2.description.1=Increases Range and Change by 25%
-for.circuit.climatiser.humidity.1=Humidity Boost I
-for.circuit.climatiser.humidity.1.description.1=Increases Range and Change by 12.5%
-for.circuit.climatiser.humidity.2=Humidity Boost II
-for.circuit.climatiser.humidity.2.description.1=Increases Range and Change by 25%
+for.circuit.former.range.1=Range Boost I
+for.circuit.former.range.1.description.1=Increases Range by 10%
+for.circuit.former.range.1.description.1=Increases Power Use by 5%
+for.circuit.former.range.2=Range Boost II
+for.circuit.former.range.2.description.1=Increases Range by 17.5%
+for.circuit.former.range.2.description.1=Increases Power Use by 8.75%
+for.circuit.former.range.3=Range Boost III
+for.circuit.former.range.3.description.1=Increases Range by 25%
+for.circuit.former.range.3.description.1=Increases Power Use by 12.5%
+for.circuit.former.efficiency.1=Efficiency Boost I
+for.circuit.former.efficiency.1.description.1=Decreases Power Use by 7.5%
+for.circuit.former.efficiency.2=Efficiency Boost II
+for.circuit.former.efficiency.2.description.1=Decreases Power Use by 10%
+for.circuit.former.efficiency.3=Efficiency Boost III
+for.circuit.former.efficiency.3.description.1=Decreases Power Use by 12.5%
+for.circuit.former.speed.1=Speed Boost I
+for.circuit.former.speed.1.description.1=Increases Speed by 15%
+for.circuit.former.speed.2=Speed Boost II
+for.circuit.former.speed.2.description.1=Increases Speed by 20%
+for.circuit.former.speed.3=Speed Boost III
+for.circuit.former.speed.3.description.1=Increases Speed by 15%
 
 for.circuit.layout.dummy.name=Not Available
 for.circuit.layout.dummy.usage=Nothing
@@ -79,8 +92,8 @@ for.circuit.layout.farms.manual.usage=Manual Farms
 for.circuit.layout.machine.upgrade.name=Machine Upgrade
 for.circuit.layout.machine.upgrade.usage=Socketed Machines
 
-for.circuit.layout.greenhouse.climatiser.name=Climatiser
-for.circuit.layout.greenhouse.climatiser.usage=Climatisers
+for.circuit.layout.habitatformer.name=Habitatformer Upgrade
+for.circuit.layout.habitatformer.usage=Habitatformers
 
 for.flowers.cacti=Cacti
 for.flowers.end=End
@@ -1114,7 +1127,7 @@ for.gui.book.categories=Categories
 for.gui.book.category.core.title=Core
 for.gui.book.category.lepidopterology.title=Lepidopterology
 for.gui.book.category.mail.title=Mail
-for.gui.book.category.greenhouse.title=Greenhouse (WIP)
+for.gui.book.category.habitatformer.title=Habitatformer
 for.gui.book.category.beekeeping.title=Beekeeping
 for.gui.book.category.arboriculture.title=Arboriculture
 for.gui.book.category.farming.title=Farming
@@ -1426,20 +1439,12 @@ tile.for.habitatformer_hygroregulator.name=Habitatformer Hygroregulator
 tile.for.habitatformer_heater.name=Habitatformer Heater
 tile.for.habitatformer_fan.name=Habitatformer Fan
 
-item.for.habitat_screen.name=Portable Greenhouse Screen
+item.for.habitat_screen.name=Portable Habitat Screen
 
 for.gui.habitatformer.climate.target=Targeted: %s
 for.gui.habitatformer.climate.value=Value: %s
 for.gui.habitatformer.climate.temperature=Temperature
 for.gui.habitatformer.climate.humidity=Humidity
-
-for.message.habitat_screen.fail=You only can use this item if it is linked to a greenhouse
-for.message.habitat_screen.position=This item is now linked to a greenhouse
-for.message.habitat_screen.preview.active=Switched preview mod to active
-for.message.habitat_screen.preview.inactive=Switched preview mod to inactive
-for.message.habitat_screen.center=You have set the center of the greenhouse to the coordinates
-for.message.habitat_screen.away=You are too far away from the greenhouse to use this item
-for.message.habitat_screen.notassembled=You only can link this item to the an assembled greenhouse
 
 for.habitat_screen.mode=Preview Mode: %s
 for.habitat_screen.mode.active=Active

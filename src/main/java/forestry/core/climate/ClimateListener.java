@@ -95,8 +95,15 @@ public class ClimateListener implements IClimateListener {
 		}
 	}
 
-	@Override
-	public IClimateState getState(boolean update, boolean syncToClient) {
+	private IClimateState getState() {
+		return getState(true);
+	}
+
+	private IClimateState getState(boolean update) {
+		return getState(update, true);
+	}
+
+	private IClimateState getState(boolean update, boolean syncToClient) {
 		World worldObj = getWorldObj();
 		if (!worldObj.isRemote && update) {
 			updateState(syncToClient);
@@ -158,6 +165,11 @@ public class ClimateListener implements IClimateListener {
 			humidity = biome.getRainfall();
 		}
 		return humidity;
+	}
+
+	@Override
+	public IClimateState getClimateState() {
+		return ClimateStateHelper.of(getExactTemperature(), getExactHumidity());
 	}
 
 	@SideOnly(Side.CLIENT)

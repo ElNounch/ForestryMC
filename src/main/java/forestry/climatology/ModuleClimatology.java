@@ -100,7 +100,7 @@ public class ModuleClimatology extends BlankForestryModule {
 		proxy.preInti();
 		proxy.initializeModels();
 
-		ICircuitLayout layoutManaged = new CircuitLayout("habitat.former", CircuitSocketType.HABITAT_FORMER);
+		ICircuitLayout layoutManaged = new CircuitLayout("habitatformer", CircuitSocketType.HABITAT_FORMER);
 		ChipsetManager.circuitRegistry.registerLayout(layoutManaged);
 		// Capabilities
 		CapabilityManager.INSTANCE.register(IClimateHolder.class, new NullStorage<>(), ClimateHolder::new);
@@ -120,7 +120,7 @@ public class ModuleClimatology extends BlankForestryModule {
 		Circuits.formerRange2 = new CircuitHabitatformer("former.range.2", 0.0875F, 0.175F, 0.0F);
 		Circuits.formerRange3 = new CircuitHabitatformer("former.range.3", 0.125F, 0.25F, 0.0F);
 		Circuits.formerEfficiency1 = new CircuitHabitatformer("former.efficiency.1", 0.0F, 0.0F, -0.075F);
-		Circuits.formerEfficiency2 = new CircuitHabitatformer("former.efficiency.2", 0.0F, 0.0F, -0.10F);
+		Circuits.formerEfficiency2 = new CircuitHabitatformer("former.efficiency.2", 0.0F, 0.0F, -0.1F);
 		Circuits.formerEfficiency3 = new CircuitHabitatformer("former.efficiency.3", 0.0F, 0.0F, -0.125F);
 		Circuits.formerSpeed1 = new CircuitHabitatformer("former.speed.1", 0.15F, 0.0F, 0.0F);
 		Circuits.formerSpeed2 = new CircuitHabitatformer("former.speed.2", 0.20F, 0.0F, 0.0F);
@@ -169,7 +169,7 @@ public class ModuleClimatology extends BlankForestryModule {
 			'G', OreDictUtil.BLOCK_GLASS);
 
 
-		ICircuitLayout layout = ChipsetManager.circuitRegistry.getLayout("forestry.habitat.former");
+		ICircuitLayout layout = ChipsetManager.circuitRegistry.getLayout("forestry.habitatformer");
 		if (layout == null) {
 			return;
 		}

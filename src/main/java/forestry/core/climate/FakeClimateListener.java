@@ -22,8 +22,8 @@ public class FakeClimateListener implements IClimateListener {
 	}
 
 	@Override
-	public IClimateState getState(boolean update, boolean syncToClient) {
-		return ClimateStateHelper.INSTANCE.absent();
+	public IClimateState getClimateState() {
+		return AbsentClimateState.INSTANCE;
 	}
 
 	@SideOnly(Side.CLIENT)
