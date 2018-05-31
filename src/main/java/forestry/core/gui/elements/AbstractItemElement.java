@@ -51,5 +51,10 @@ public abstract class AbstractItemElement extends GuiElement {
 		return ItemTooltipUtil.getInformation(itemStack);
 	}
 
+	@Override
+	public boolean hasTooltip() {
+		return true;
+	}
+
 	protected abstract ItemStack getItemStack();
 }

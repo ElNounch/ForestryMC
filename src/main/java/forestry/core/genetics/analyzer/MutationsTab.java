@@ -7,7 +7,6 @@ import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.TextFormatting;
 
 import forestry.api.genetics.IAlleleSpecies;
 import forestry.api.genetics.IBreedingTracker;
@@ -15,6 +14,7 @@ import forestry.api.genetics.IGenome;
 import forestry.api.genetics.IIndividual;
 import forestry.api.genetics.IMutation;
 import forestry.api.genetics.ISpeciesRoot;
+import forestry.api.gui.GuiConstants;
 import forestry.api.gui.GuiElementAlignment;
 import forestry.api.gui.IElementGenetic;
 import forestry.api.gui.IElementLayoutHelper;
@@ -38,7 +38,7 @@ public class MutationsTab extends DatabaseTab {
 		IElementLayoutHelper groupHelper = container.layoutHelper((x, y) -> GuiElementFactory.INSTANCE.createHorizontal(x + 1, y, 16), 100, 0);
 		Collection<? extends IMutation> mutations = getValidMutations(speciesRoot.getCombinations(species));
 		if(!mutations.isEmpty()) {
-			container.text(TextFormatting.UNDERLINE + Translator.translateToLocal("for.gui.database.mutations.further"), GuiElementAlignment.TOP_CENTER);
+			container.label(Translator.translateToLocal("for.gui.database.mutations.further"), GuiElementAlignment.TOP_CENTER, GuiConstants.UNDERLINED_STYLE);
 			mutations.forEach(mutation -> groupHelper.add(GuiElementFactory.INSTANCE.createMutation(0, 0, 50, 16, mutation, species, breedingTracker)));
 			groupHelper.finish(true);
 		}
@@ -46,7 +46,7 @@ public class MutationsTab extends DatabaseTab {
 		if(mutations.isEmpty()){
 			return;
 		}
-		container.text(TextFormatting.UNDERLINE + Translator.translateToLocal("for.gui.database.mutations.resultant"), GuiElementAlignment.TOP_CENTER);
+		container.label(Translator.translateToLocal("for.gui.database.mutations.resultant"), GuiElementAlignment.TOP_CENTER, GuiConstants.UNDERLINED_STYLE);
 		mutations.forEach(mutation -> groupHelper.add(GuiElementFactory.INSTANCE.createMutationResultant(0, 0, 50, 16, mutation, breedingTracker)));
 		groupHelper.finish(true);
 	}

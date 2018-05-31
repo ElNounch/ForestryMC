@@ -16,11 +16,12 @@ import forestry.api.genetics.IGeneticAnalyzerProvider;
 import forestry.api.genetics.IIndividual;
 import forestry.api.genetics.ISpeciesRoot;
 import forestry.api.gui.IGuiElement;
+import forestry.api.gui.IWindowElement;
+import forestry.api.gui.events.GuiEvent;
 import forestry.core.config.Constants;
 import forestry.core.gui.Drawable;
 import forestry.core.gui.buttons.StandardButtonTextureSets;
 import forestry.core.gui.elements.layouts.ElementGroup;
-import forestry.core.gui.elements.layouts.ScrollableElement;
 import forestry.core.gui.widgets.IScrollable;
 import forestry.core.network.packets.PacketGuiSelectRequest;
 import forestry.core.utils.NetworkUtil;
@@ -44,6 +45,7 @@ public class GeneticAnalyzer extends ElementGroup implements IGeneticAnalyzer, I
 	/*Attributes - Gui Elements */
 	private final ScrollBarElement scrollBar;
 	private final ScrollableElement scrollable;
+	private final GeneticElement scrollableContent;
 	private final GeneticAnalyzerTabs tabs;
 	private final IGuiElement itemElement;
 	private final ButtonElement leftButton;
@@ -51,11 +53,11 @@ public class GeneticAnalyzer extends ElementGroup implements IGeneticAnalyzer, I
 	private final ButtonElement analyzeButton;
 
 	/* Attributes - State */
-	private boolean visible = true;
 	private int selectedSlot = -1;
 
-	public GeneticAnalyzer(int xPos, int yPos, boolean rightBoarder, IGeneticAnalyzerProvider provider) {
+	public GeneticAnalyzer(IWindowElement window, int xPos, int yPos, boolean rightBoarder, IGeneticAnalyzerProvider provider) {
 		super(xPos - (rightBoarder ? 6 : 0), yPos, 189 + (rightBoarder ? 6 : 0), 194);
+		window.add(this);
 		this.provider = provider;
 
 		//Background Texture
@@ -63,6 +65,9 @@ public class GeneticAnalyzer extends ElementGroup implements IGeneticAnalyzer, I
 		//Text Area
 		scrollable = new ScrollableElement(32 + 10, 8, 145, 150);
 		add(scrollable);
+		scrollableContent = new GeneticElement(0, 0, 145);
+		scrollable.setContent(scrollableContent);
+		scrollable.add(scrollableContent);
 		//Scrollbar
 		scrollBar = new ScrollBarElement(width - 10 - (rightBoarder ? 6 : 0), 12, SCROLLBAR_BACKGROUND, false, SCROLLBAR_SLIDER);
 		scrollBar.setVisible(false);
@@ -82,6 +87,14 @@ public class GeneticAnalyzer extends ElementGroup implements IGeneticAnalyzer, I
 				return provider.getSpecimen(selectedSlot);
 			}
 		});
+		addSelfEventHandler(GuiEvent.KeyEvent.class, event -> {
+			int keyCode = event.getKey();
+			if ((keyCode == Keyboard.KEY_DOWN || keyCode == Keyboard.KEY_RIGHT) && rightButton.isEnabled()) {
+				rightButton.onPressed();
+			} else if ((keyCode == Keyboard.KEY_UP || keyCode == Keyboard.KEY_LEFT) && leftButton.isEnabled()) {
+				leftButton.onPressed();
+			}
+		});
 	}
 
 	@Override
@@ -89,10 +102,6 @@ public class GeneticAnalyzer extends ElementGroup implements IGeneticAnalyzer, I
 		leftButton.setEnabled(canSubtract());
 		rightButton.setEnabled(canAdd());
 		updateSelected();
-	}
-
-	public boolean isVisible() {
-		return visible;
 	}
 
 	public void setVisible(boolean visible) {
@@ -111,7 +120,7 @@ public class GeneticAnalyzer extends ElementGroup implements IGeneticAnalyzer, I
 	@SuppressWarnings("unchecked")
 	@Override
 	public void update() {
-		if (!visible) {
+		if (!isVisible()) {
 			return;
 		}
 		ItemStack stack = provider.getSpecimen(selectedSlot);
@@ -125,11 +134,9 @@ public class GeneticAnalyzer extends ElementGroup implements IGeneticAnalyzer, I
 						tabs.setPlugin(databasePlugin);
 						IDatabaseTab tab = tabs.getSelected();
 						//Clean the element area
-						scrollable.clear();
+						scrollableContent.clear();
 						//Create the new elements
-						tab.createElements(scrollable, individual, stack);
-						//Update the visible elements
-						scrollable.updateVisibleElements(0);
+						tab.createElements(scrollableContent, individual, stack);
 						//Update the scrollbar
 						int invisibleElements = scrollable.getInvisibleElementCount();
 						if (invisibleElements > 0) {
@@ -146,7 +153,7 @@ public class GeneticAnalyzer extends ElementGroup implements IGeneticAnalyzer, I
 			}
 		}
 		//Clean the element area
-		scrollable.clear();
+		scrollableContent.clear();
 		FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
 		String key = "for.gui.portablealyzer.help";
 		//if(state == DatabaseScreenLogic.ScreenState.NO_PLUGIN){
@@ -154,18 +161,10 @@ public class GeneticAnalyzer extends ElementGroup implements IGeneticAnalyzer, I
 		//}
 		List<String> lines = fontRenderer.listFormattedStringToWidth(Translator.translateToLocal(key), scrollable.getWidth());
 		for (String text : lines) {
-			scrollable.text(text);
+			scrollableContent.label(text);
 		}
 		//Disable the scrollbar
 		scrollBar.setVisible(false);
-	}
-
-	@Override
-	public void draw(int mouseX, int mouseY) {
-		if (!visible) {
-			return;
-		}
-		super.draw(mouseX, mouseY);
 	}
 
 	@Override
@@ -191,22 +190,8 @@ public class GeneticAnalyzer extends ElementGroup implements IGeneticAnalyzer, I
 	}*/
 
 	@Override
-	public boolean keyTyped(char typedChar, int keyCode) {
-		if ((keyCode == Keyboard.KEY_DOWN || keyCode == Keyboard.KEY_RIGHT) && rightButton.isEnabled()) {
-			rightButton.onPressed();
-			return true;
-		} else if ((keyCode == Keyboard.KEY_UP || keyCode == Keyboard.KEY_LEFT) && leftButton.isEnabled()) {
-			leftButton.onPressed();
-			return true;
-		}
-		return false;
-	}
-
-	@Override
 	public boolean isFocused(int mouseX, int mouseY) {
-		mouseX += getX();
-		mouseY += getY();
-		return isMouseOver(mouseX, mouseY);
+		return isMouseOver();
 	}
 
 	@Override

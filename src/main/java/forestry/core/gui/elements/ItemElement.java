@@ -21,6 +21,7 @@ public class ItemElement extends AbstractItemElement {
 		this.itemStack = itemStack;
 	}
 
+	@Override
 	protected ItemStack getItemStack() {
 		return itemStack;
 	}

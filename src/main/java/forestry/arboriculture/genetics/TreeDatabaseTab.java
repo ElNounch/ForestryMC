@@ -19,8 +19,10 @@ import forestry.api.arboriculture.ITree;
 import forestry.api.genetics.IAlleleInteger;
 import forestry.api.genetics.IDatabaseTab;
 import forestry.api.genetics.IFruitFamily;
+import forestry.api.gui.GuiConstants;
 import forestry.api.gui.GuiElementAlignment;
 import forestry.api.gui.IElementGenetic;
+import forestry.api.gui.style.ITextStyle;
 import forestry.arboriculture.genetics.alleles.AlleleFruits;
 import forestry.core.gui.elements.GuiElementFactory;
 import forestry.core.utils.Translator;
@@ -37,9 +39,9 @@ public class TreeDatabaseTab implements IDatabaseTab<ITree> {
 	public void createElements(IElementGenetic container, ITree tree, ItemStack itemStack) {
 		IAlleleTreeSpecies primarySpecies = tree.getGenome().getPrimary();
 		IAlleleTreeSpecies species = active ? primarySpecies : tree.getGenome().getSecondary();
-		int speciesColor = GuiElementFactory.INSTANCE.getColorCoding(species.isDominant());
+		ITextStyle speciesStyle = GuiElementFactory.INSTANCE.getStateStyle(species.isDominant());
 
-		container.text(Translator.translateToLocal("for.gui.database.tab." + (active ? "active" : "inactive") + "_species.name"), GuiElementAlignment.TOP_CENTER, 0xcfb53b);
+		container.label(Translator.translateToLocal("for.gui.database.tab." + (active ? "active" : "inactive") + "_species.name"), GuiElementAlignment.TOP_CENTER, GuiElementFactory.DATABASE_TITLE);
 
 		container.addAlleleRow(Translator.translateToLocal("for.gui.species"), tree, EnumTreeChromosome.SPECIES, active);
 
@@ -57,28 +59,28 @@ public class TreeDatabaseTab implements IDatabaseTab<ITree> {
 
 		container.addRow(Translator.translateToLocal("for.gui.native"), Translator.translateToLocal("for.gui." + tree.getGenome().getPrimary().getPlantType().toString().toLowerCase(Locale.ENGLISH)), species.isDominant());
 
-		container.text(TextFormatting.UNDERLINE + Translator.translateToLocal("for.gui.supports"), GuiElementAlignment.TOP_CENTER);
+		container.label(Translator.translateToLocal("for.gui.supports"), GuiElementAlignment.TOP_CENTER, GuiConstants.UNDERLINED_STYLE);
 		List<IFruitFamily> families = new ArrayList<>(tree.getGenome().getPrimary().getSuitableFruit());
 
 		for (IFruitFamily fruitFamily : families) {
-			container.text(fruitFamily.getName(), GuiElementAlignment.TOP_CENTER, speciesColor);
+			container.label(fruitFamily.getName(), GuiElementAlignment.TOP_CENTER, speciesStyle);
 		}
 
 		IAlleleFruit fruit = (IAlleleFruit) (active ? tree.getGenome().getActiveAllele(EnumTreeChromosome.FRUITS) : tree.getGenome().getInactiveAllele(EnumTreeChromosome.FRUITS));
-		int colorCoding = GuiElementFactory.INSTANCE.getColorCoding(tree.getGenome().getActiveAllele(EnumTreeChromosome.FRUITS).isDominant());
+		ITextStyle textStyle = GuiElementFactory.INSTANCE.getStateStyle(tree.getGenome().getActiveAllele(EnumTreeChromosome.FRUITS).isDominant());
 
-		container.text(TextFormatting.UNDERLINE + Translator.translateToLocal("for.gui.fruits"), GuiElementAlignment.TOP_CENTER);
+		container.label(Translator.translateToLocal("for.gui.fruits"), GuiElementAlignment.TOP_CENTER, GuiConstants.UNDERLINED_STYLE);
 		String strike = "";
 		if (!species.getSuitableFruit().contains(fruit.getProvider().getFamily()) && fruit != AlleleFruits.fruitNone) {
 			strike = TextFormatting.STRIKETHROUGH.toString();
 		}
-		container.text(strike + fruit.getProvider().getDescription(), GuiElementAlignment.TOP_CENTER, colorCoding);
+		container.label(strike + fruit.getProvider().getDescription(), GuiElementAlignment.TOP_CENTER, textStyle);
 
 		IFruitFamily family = fruit.getProvider().getFamily();
 
 		if (family != null && !family.getUID().equals(EnumFruitFamily.NONE.getUID())) {
-			container.text(TextFormatting.UNDERLINE + Translator.translateToLocal("for.gui.family"), GuiElementAlignment.TOP_CENTER);
-			container.text(family.getName(), GuiElementAlignment.TOP_CENTER, colorCoding);
+			container.label(Translator.translateToLocal("for.gui.family"), GuiElementAlignment.TOP_CENTER, GuiConstants.UNDERLINED_STYLE);
+			container.label(family.getName(), GuiElementAlignment.TOP_CENTER, textStyle);
 		}
 
 	}

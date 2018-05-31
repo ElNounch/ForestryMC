@@ -1,7 +1,6 @@
 package forestry.lepidopterology.genetics;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.TextFormatting;
 
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -10,6 +9,7 @@ import forestry.api.genetics.AlleleManager;
 import forestry.api.genetics.IAlleleInteger;
 import forestry.api.genetics.IAlleleTolerance;
 import forestry.api.genetics.IDatabaseTab;
+import forestry.api.gui.GuiConstants;
 import forestry.api.gui.GuiElementAlignment;
 import forestry.api.gui.IElementGenetic;
 import forestry.api.lepidopterology.EnumButterflyChromosome;
@@ -18,6 +18,7 @@ import forestry.api.lepidopterology.IAlleleButterflySpecies;
 import forestry.api.lepidopterology.IButterfly;
 import forestry.core.genetics.GenericRatings;
 import forestry.core.genetics.alleles.AlleleBoolean;
+import forestry.core.gui.elements.GuiElementFactory;
 import forestry.core.utils.StringUtil;
 import forestry.core.utils.Translator;
 
@@ -33,7 +34,7 @@ public class ButterflyDatabaseTab implements IDatabaseTab<IButterfly> {
 	public void createElements(IElementGenetic container, IButterfly butterfly, ItemStack itemStack) {
 		IAlleleButterflySpecies primarySpecies = butterfly.getGenome().getPrimary();
 
-		container.text(Translator.translateToLocal("for.gui.database.tab." + (active ? "active" : "inactive") + "_species.name"), GuiElementAlignment.TOP_CENTER, 0xcfb53b);
+		container.label(Translator.translateToLocal("for.gui.database.tab." + (active ? "active" : "inactive") + "_species.name"), GuiElementAlignment.TOP_CENTER, GuiElementFactory.DATABASE_TITLE);
 
 		container.addAlleleRow(Translator.translateToLocal("for.gui.species"), butterfly, EnumButterflyChromosome.SPECIES, active);
 
@@ -79,7 +80,7 @@ public class ButterflyDatabaseTab implements IDatabaseTab<IButterfly> {
 			}
 		}
 
-		container.text(TextFormatting.UNDERLINE + Translator.translateToLocal("for.gui.diurnal"), GuiElementAlignment.TOP_CENTER);
+		container.label(Translator.translateToLocal("for.gui.diurnal"), GuiElementAlignment.TOP_CENTER, GuiConstants.UNDERLINED_STYLE);
 		container.addRow(Translator.translateToLocal("for.gui.diurnal"), diurnal, false);
 
 		container.addRow(Translator.translateToLocal("for.gui.nocturnal"), nocturnal, false);

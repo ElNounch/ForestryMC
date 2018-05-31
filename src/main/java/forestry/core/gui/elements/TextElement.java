@@ -27,7 +27,7 @@ public class TextElement extends GuiElement {
 		if (width < 0) {
 			boolean uni = FONT_RENDERER.getUnicodeFlag();
 			FONT_RENDERER.setUnicodeFlag(this.unicode);
-			this.width = FONT_RENDERER.getStringWidth(text);
+			setWidth(FONT_RENDERER.getStringWidth(text));
 			FONT_RENDERER.setUnicodeFlag(uni);
 		}
 	}

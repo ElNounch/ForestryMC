@@ -2,11 +2,10 @@ package forestry.book.gui.elements;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.util.text.TextFormatting;
-
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import forestry.api.gui.GuiConstants;
 import forestry.api.gui.GuiElementAlignment;
 import forestry.book.gui.GuiForesterBook;
 import forestry.core.gui.Drawable;
@@ -64,7 +63,7 @@ public abstract class SelectionElement<R> extends PaneLayout {
 		onIndexUpdate(index, recipes[index]);
 		if (text != null) {
 			text.clear();
-			text.text(TextFormatting.BLACK.toString() + (index + 1) + "/" + recipes.length, GuiElementAlignment.BOTTOM_CENTER, 0).setYPosition(2);
+			text.label((index + 1) + "/" + recipes.length, GuiElementAlignment.BOTTOM_CENTER, GuiConstants.BLACK_STYLE).setYPosition(2);
 		}
 		if (leftButton != null) {
 			leftButton.setEnabled(index > 0);

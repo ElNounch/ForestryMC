@@ -16,14 +16,19 @@ import forestry.api.genetics.IAlleleTolerance;
 import forestry.api.genetics.IDatabaseTab;
 import forestry.api.gui.GuiElementAlignment;
 import forestry.api.gui.IElementGenetic;
+import forestry.api.gui.style.ITextStyle;
+import forestry.api.gui.style.TextStyleBuilder;
 import forestry.api.lepidopterology.EnumButterflyChromosome;
 import forestry.core.genetics.alleles.AlleleBoolean;
+import forestry.core.gui.elements.GuiElementFactory;
 import forestry.core.render.ColourProperties;
 import forestry.core.utils.StringUtil;
 import forestry.core.utils.Translator;
 
 @SideOnly(Side.CLIENT)
 public class BeeDatabaseTab implements IDatabaseTab<IBee> {
+	private static final ITextStyle BINOMIAL = TextStyleBuilder.create().color(()->ColourProperties.INSTANCE.get("gui.beealyzer.binomial")).build();
+
 	private final boolean active;
 
 	BeeDatabaseTab(boolean active) {
@@ -38,7 +43,7 @@ public class BeeDatabaseTab implements IDatabaseTab<IBee> {
 		}
 		IAlleleSpecies primarySpecies = bee.getGenome().getPrimary();
 
-		container.text(Translator.translateToLocal("for.gui.database.tab." + (active ? "active" : "inactive") + "_species.name"), GuiElementAlignment.TOP_CENTER, 0xcfb53b);
+		container.label(Translator.translateToLocal("for.gui.database.tab." + (active ? "active" : "inactive") + "_species.name"), GuiElementAlignment.TOP_CENTER, GuiElementFactory.DATABASE_TITLE);
 
 		container.addAlleleRow(Translator.translateToLocal("for.gui.species"), bee, EnumBeeChromosome.SPECIES, active);
 
@@ -107,7 +112,7 @@ public class BeeDatabaseTab implements IDatabaseTab<IBee> {
 				displayTextKey = "for.bees.stock.ignoble";
 			}
 			displayText = Translator.translateToLocal(displayTextKey);
-			container.text(displayText, GuiElementAlignment.TOP_CENTER, ColourProperties.INSTANCE.get("gui.beealyzer.binomial"));
+			container.label(displayText, GuiElementAlignment.TOP_CENTER, BINOMIAL);
 		}
 	}
 
