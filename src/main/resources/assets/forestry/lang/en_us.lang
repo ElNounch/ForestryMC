@@ -146,6 +146,9 @@ for.gui.database.mutations.further=Further Mutations
 for.gui.database.mutations.resultant=Resultant Mutations
 for.gui.database.support=This individual has currently no integration for the database.
 
+for.gui.encyclopedia.authority=Discovered by: %s
+for.gui.encyclopedia.complexity=Complexity: %s
+
 for.gui.blank=Blank
 for.gui.cave=Cave Dwelling
 for.gui.climate=Climate

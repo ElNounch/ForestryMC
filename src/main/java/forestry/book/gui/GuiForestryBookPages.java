@@ -41,8 +41,8 @@ public class GuiForestryBookPages extends GuiForesterBook {
 		this.category = category;
 		this.entry = entry;
 		this.parent = parent;
-		leftPage = window.panel(LEFT_PAGE_START_X, LEFT_PAGE_START_Y, PAGE_WIDTH, PAGE_HEIGHT);
-		rightPage = window.panel(RIGHT_PAGE_START_X, RIGHT_PAGE_START_Y, PAGE_WIDTH, PAGE_HEIGHT);
+		leftPage = window.pane(LEFT_PAGE_START_X, LEFT_PAGE_START_Y, PAGE_WIDTH, PAGE_HEIGHT);
+		rightPage = window.pane(RIGHT_PAGE_START_X, RIGHT_PAGE_START_Y, PAGE_WIDTH, PAGE_HEIGHT);
 		pages = ImmutableList.copyOf(entry.getPageFactory().load(entry, GuiForesterBook.PAGE_HEIGHT - 13, GuiForesterBook.PAGE_HEIGHT, GuiForesterBook.PAGE_WIDTH));
 		setPages(0);
 	}

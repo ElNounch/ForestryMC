@@ -3,6 +3,7 @@ package forestry.book.gui;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.util.ResourceLocation;
 
+import forestry.book.gui.elements.encyclopedia.EncyclopediaContent;
 import forestry.book.gui.elements.encyclopedia.EncyclopediaSpeciesList;
 import forestry.core.config.Constants;
 import forestry.core.gui.GuiWindow;
@@ -23,7 +24,8 @@ public class GuiEncyclopedia extends GuiWindow implements IGuiSizable {
 
 	public GuiEncyclopedia() {
 		super(X_SIZE, Y_SIZE);
-		window.add(new EncyclopediaSpeciesList());
+		window.add(new EncyclopediaContent()).setLocation(GuiEncyclopedia.LEFT_PAGE_START_X, GuiEncyclopedia.PAGE_START_Y);
+		window.add(new EncyclopediaSpeciesList()).setLocation(GuiEncyclopedia.RIGHT_PAGE_START_X, GuiEncyclopedia.PAGE_START_Y);
 	}
 
 	@Override

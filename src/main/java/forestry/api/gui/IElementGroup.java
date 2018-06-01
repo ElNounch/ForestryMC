@@ -57,26 +57,37 @@ public interface IElementGroup extends IGuiElement {
 	 */
 	List<IGuiElement> getElements();
 
-	IGuiElement item(int xPos, int yPos, ItemStack itemStack);
+	IItemElement item(int xPos, int yPos, ItemStack itemStack);
 
-	default IGuiElement item(ItemStack itemStack) {
+	default IItemElement item(ItemStack itemStack) {
 		return item(0, 0, itemStack);
 	}
 
 	/**
-	 * Adds a text element with the default color,the align {@link GuiElementAlignment#TOP_LEFT} and the height 12.
+	 * Adds a single line of text.
 	 */
-	IGuiElement label(String text);
+	ILabelElement label(String text);
 
-	IGuiElement label(String text, ITextStyle style);
+	ILabelElement label(String text, ITextStyle style);
 
-	IGuiElement label(String text, GuiElementAlignment align);
+	ILabelElement label(String text, GuiElementAlignment align);
 
-	IGuiElement label(String text, GuiElementAlignment align, ITextStyle textStyle);
+	ILabelElement label(String text, GuiElementAlignment align, ITextStyle textStyle);
 
-	IGuiElement label(String text, int width, int height, GuiElementAlignment align, ITextStyle textStyle);
+	ILabelElement label(String text, int width, int height, GuiElementAlignment align, ITextStyle textStyle);
 
-	IGuiElement label(String text, int x, int y, int width, int height, GuiElementAlignment align, ITextStyle textStyle);
+	ILabelElement label(String text, int x, int y, int width, int height, GuiElementAlignment align, ITextStyle textStyle);
+
+	/**
+	 * Adds a text element that splits the text with wordwrap.
+	 */
+	ITextElement splitText(String text, int width);
+
+	ITextElement splitText(String text, int width, ITextStyle textStyle);
+
+	ITextElement splitText(String text, int width, GuiElementAlignment align, ITextStyle textStyle);
+
+	ITextElement splitText(String text, int x, int y, int width, GuiElementAlignment align, ITextStyle textStyle);
 
 	default IElementLayout vertical(int width) {
 		return vertical(0, 0, width);
@@ -90,10 +101,10 @@ public interface IElementGroup extends IGuiElement {
 		return horizontal(0, 0, height);
 	}
 
-	IElementGroup panel(int xPos, int yPos, int width, int height);
+	IElementGroup pane(int xPos, int yPos, int width, int height);
 
-	default IElementGroup panel(int width, int height) {
-		return panel(0, 0, width, height);
+	default IElementGroup pane(int width, int height) {
+		return pane(0, 0, width, height);
 	}
 
 	IElementLayoutHelper layoutHelper(IElementLayoutHelper.LayoutFactory layoutFactory, int width, int height);

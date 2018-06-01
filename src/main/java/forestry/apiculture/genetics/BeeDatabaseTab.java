@@ -27,7 +27,7 @@ import forestry.core.utils.Translator;
 
 @SideOnly(Side.CLIENT)
 public class BeeDatabaseTab implements IDatabaseTab<IBee> {
-	private static final ITextStyle BINOMIAL = TextStyleBuilder.create().color(()->ColourProperties.INSTANCE.get("gui.beealyzer.binomial")).build();
+	private static final ITextStyle BINOMIAL = new TextStyleBuilder().color(()->ColourProperties.INSTANCE.get("gui.beealyzer.binomial")).build();
 
 	private final boolean active;
 

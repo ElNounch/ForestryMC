@@ -40,7 +40,7 @@ public abstract class SelectionElement<R> extends PaneLayout {
 		this.recipes = recipes;
 		if (recipes.length > 1) {
 			drawable(0, 0, CRAFTING_COUNT).setAlign(GuiElementAlignment.BOTTOM_CENTER);
-			text = panel(width, this.height);
+			text = pane(width, this.height);
 			leftButton = add(new ButtonElement(-27, -2, LEFT_BUTTON, e -> setIndex(index - 1)));
 			leftButton.setAlign(GuiElementAlignment.BOTTOM_CENTER);
 
@@ -51,7 +51,7 @@ public abstract class SelectionElement<R> extends PaneLayout {
 			leftButton = null;
 			rightButton = null;
 		}
-		selectedElement = GuiElementFactory.INSTANCE.createPanel(0, 2, width, this.height);
+		selectedElement = GuiElementFactory.INSTANCE.createPane(0, 2, width, this.height);
 	}
 
 	protected final void setIndex(int index) {

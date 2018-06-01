@@ -39,10 +39,10 @@ import forestry.core.render.ColourProperties;
 
 public class GuiElementFactory implements IGuiElementFactory {
 	/* Constants */
-	public static final ITextStyle DOMINANT_STYLE = TextStyleBuilder.create().color(() -> ColourProperties.INSTANCE.get("gui.beealyzer.dominant")).build();
-	public static final ITextStyle RECESSIVE_STYLE = TextStyleBuilder.create().color(() -> ColourProperties.INSTANCE.get("gui.beealyzer.recessive")).build();
-	public static final ITextStyle GUI_STYLE = TextStyleBuilder.create().color(() -> ColourProperties.INSTANCE.get("gui.screen")).build();
-	public static final ITextStyle DATABASE_TITLE = TextStyleBuilder.create().color(0xcfb53b).build();
+	public static final ITextStyle DOMINANT_STYLE = new TextStyleBuilder().color(() -> ColourProperties.INSTANCE.get("gui.beealyzer.dominant")).build();
+	public static final ITextStyle RECESSIVE_STYLE = new TextStyleBuilder().color(() -> ColourProperties.INSTANCE.get("gui.beealyzer.recessive")).build();
+	public static final ITextStyle GUI_STYLE = new TextStyleBuilder().color(() -> ColourProperties.INSTANCE.get("gui.screen")).build();
+	public static final ITextStyle DATABASE_TITLE = new TextStyleBuilder().color(0xcfb53b).build();
 	private static final ResourceLocation TEXTURE = new ResourceLocation(Constants.MOD_ID, Constants.TEXTURE_PATH_GUI + "/database_mutation_screen.png");
 
 	/* Drawables */
@@ -74,7 +74,7 @@ public class GuiElementFactory implements IGuiElementFactory {
 	}
 
 	@Override
-	public ElementGroup createPanel(int xPos, int yPos, int width, int height) {
+	public ElementGroup createPane(int xPos, int yPos, int width, int height) {
 		return new PaneLayout(xPos, yPos, width, height);
 	}
 

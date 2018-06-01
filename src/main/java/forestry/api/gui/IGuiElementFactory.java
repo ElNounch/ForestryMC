@@ -63,5 +63,5 @@ public interface IGuiElementFactory {
 
 	IElementLayout createVertical(int xPos, int yPos, int width);
 
-	IElementGroup createPanel(int xPos, int yPos, int width, int height);
+	IElementGroup createPane(int xPos, int yPos, int width, int height);
 }

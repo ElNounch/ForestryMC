@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 import forestry.api.gui.IGuiElement;
@@ -19,7 +19,7 @@ import forestry.core.gui.event.EventValueChanged;
 public class ElementList<V> extends VerticalLayout {
 	private final Map<V, IGuiElement> allOptions = new LinkedHashMap<>();
 	private final Map<V, IGuiElement> visibleOptions = new LinkedHashMap<>();
-	private final Function<V, IGuiElement> optionFactory;
+	private final BiFunction<V, ElementList, IGuiElement> optionFactory;
 	@Nullable
 	private final V defaultValue;
 	@Nullable
@@ -27,7 +27,7 @@ public class ElementList<V> extends VerticalLayout {
 	@Nullable
 	private Predicate<V> validator;
 
-	public ElementList(int xPos, int yPos, int width, Function<V, IGuiElement> optionFactory, V defaultValue) {
+	public ElementList(int xPos, int yPos, int width, BiFunction<V, ElementList, IGuiElement> optionFactory, @Nullable V defaultValue) {
 		super(xPos, yPos, width);
 		this.optionFactory = optionFactory;
 		this.defaultValue = defaultValue;
@@ -117,7 +117,7 @@ public class ElementList<V> extends VerticalLayout {
 		clear();
 		allOptions.clear();
 		for(V option : options){
-			IGuiElement element = optionFactory.apply(option);
+			IGuiElement element = optionFactory.apply(option, this);
 			allOptions.put(option, element);
 		}
 		updateVisibleOptions();

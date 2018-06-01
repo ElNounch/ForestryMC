@@ -14,12 +14,16 @@ import forestry.api.gui.GuiElementAlignment;
 import forestry.api.gui.IElementGroup;
 import forestry.api.gui.IElementLayoutHelper;
 import forestry.api.gui.IGuiElement;
+import forestry.api.gui.IItemElement;
+import forestry.api.gui.ILabelElement;
+import forestry.api.gui.ITextElement;
 import forestry.api.gui.style.ITextStyle;
 import forestry.core.gui.Drawable;
 import forestry.core.gui.elements.DrawableElement;
 import forestry.core.gui.elements.GuiElement;
 import forestry.core.gui.elements.ItemElement;
-import forestry.core.gui.elements.Label;
+import forestry.core.gui.elements.LabelElement;
+import forestry.core.gui.elements.SplitTextElement;
 
 @SideOnly(Side.CLIENT)
 public abstract class ElementGroup extends GuiElement implements IElementGroup {
@@ -87,40 +91,60 @@ public abstract class ElementGroup extends GuiElement implements IElementGroup {
 	}
 
 	@Override
-	public IGuiElement item(int xPos, int yPos, ItemStack itemStack) {
-		IGuiElement element = new ItemElement(xPos, yPos, itemStack);
+	public IItemElement item(int xPos, int yPos, ItemStack itemStack) {
+		IItemElement element = new ItemElement(xPos, yPos, itemStack);
 		add(element);
 		return element;
 	}
 
 	@Override
-	public IGuiElement label(String text) {
+	public ILabelElement label(String text) {
 		return label(text, GuiConstants.DEFAULT_STYLE);
 	}
 
 	@Override
-	public IGuiElement label(String text, ITextStyle style) {
+	public ILabelElement label(String text, ITextStyle style) {
 		return label(text, GuiElementAlignment.TOP_LEFT, style);
 	}
 
 	@Override
-	public IGuiElement label(String text, GuiElementAlignment align) {
+	public ILabelElement label(String text, GuiElementAlignment align) {
 		return label(text, align, GuiConstants.DEFAULT_STYLE);
 	}
 
 	@Override
-	public IGuiElement label(String text, GuiElementAlignment align, ITextStyle textStyle) {
+	public ILabelElement label(String text, GuiElementAlignment align, ITextStyle textStyle) {
 		return label(text, -1, 12, align, textStyle);
 	}
 
 	@Override
-	public IGuiElement label(String text, int width, int height, GuiElementAlignment align, ITextStyle textStyle) {
+	public ILabelElement label(String text, int width, int height, GuiElementAlignment align, ITextStyle textStyle) {
 		return label(text, 0, 0, width, height, align, textStyle);
 	}
 
 	@Override
-	public IGuiElement label(String text, int x, int y, int width, int height, GuiElementAlignment align, ITextStyle textStyle) {
-		return add(new Label(x, y, width, height, text, align, textStyle));
+	public ILabelElement label(String text, int x, int y, int width, int height, GuiElementAlignment align, ITextStyle textStyle) {
+		return add(new LabelElement(x, y, width, height, text, align, textStyle));
+	}
+
+	@Override
+	public ITextElement splitText(String text, int width) {
+		return splitText(text, width, GuiConstants.DEFAULT_STYLE);
+	}
+
+	@Override
+	public ITextElement splitText(String text, int width, ITextStyle textStyle) {
+		return splitText(text, width, GuiElementAlignment.TOP_LEFT, textStyle);
+	}
+
+	@Override
+	public ITextElement splitText(String text, int width, GuiElementAlignment align, ITextStyle textStyle) {
+		return splitText(text, 0, 0, width, GuiElementAlignment.TOP_LEFT, textStyle);
+	}
+
+	@Override
+	public ITextElement splitText(String text, int x, int y, int width, GuiElementAlignment align, ITextStyle textStyle) {
+		return new SplitTextElement(x, y, width, text, align, textStyle);
 	}
 
 	@Override
@@ -144,12 +168,12 @@ public abstract class ElementGroup extends GuiElement implements IElementGroup {
 	}
 
 	@Override
-	public ElementGroup panel(int xPos, int yPos, int width, int height) {
+	public ElementGroup pane(int xPos, int yPos, int width, int height) {
 		return add(new PaneLayout(xPos, yPos, width, height));
 	}
 
 	@Override
-	public ElementGroup panel(int width, int height) {
+	public ElementGroup pane(int width, int height) {
 		return add(new PaneLayout(0, 0, width, height));
 	}
 

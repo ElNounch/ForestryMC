@@ -83,16 +83,18 @@ public class GeneticAnalyzer extends ElementGroup implements IGeneticAnalyzer, I
 		analyzeButton = add(new ButtonElement(itemElement.getX() + 80, itemElement.getY() + 2, ANALYZER_BUTTON, (button) -> NetworkUtil.sendToServer(new PacketGuiSelectRequest(0, provider.getSelectedSlot(selectedSlot)))));
 		add(new AbstractItemElement(itemElement.getX() + 44, itemElement.getY() + 9) {
 			@Override
-			protected ItemStack getItemStack() {
+			protected ItemStack getStack() {
 				return provider.getSpecimen(selectedSlot);
 			}
 		});
-		addSelfEventHandler(GuiEvent.KeyEvent.class, event -> {
+		addEventHandler(GuiEvent.KeyEvent.class, event -> {
 			int keyCode = event.getKey();
 			if ((keyCode == Keyboard.KEY_DOWN || keyCode == Keyboard.KEY_RIGHT) && rightButton.isEnabled()) {
 				rightButton.onPressed();
 			} else if ((keyCode == Keyboard.KEY_UP || keyCode == Keyboard.KEY_LEFT) && leftButton.isEnabled()) {
 				leftButton.onPressed();
+			} else if(keyCode == Keyboard.KEY_RETURN && analyzeButton.isEnabled()){
+				analyzeButton.onPressed();
 			}
 		});
 	}

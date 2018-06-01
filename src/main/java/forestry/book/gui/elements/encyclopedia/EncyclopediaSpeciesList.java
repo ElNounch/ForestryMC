@@ -3,18 +3,19 @@ package forestry.book.gui.elements.encyclopedia;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 
 import forestry.api.apiculture.BeeManager;
 import forestry.api.apiculture.IBee;
-import forestry.api.genetics.IAlleleSpecies;
+import forestry.book.encyclopedia.EncyclopediaEntry;
 import forestry.book.gui.GuiEncyclopedia;
 import forestry.core.gui.Drawable;
+import forestry.core.gui.elements.ElementList;
 import forestry.core.gui.elements.GeneticAnalyzer;
 import forestry.core.gui.elements.ScrollBarElement;
 import forestry.core.gui.elements.ScrollableElement;
 import forestry.core.gui.elements.layouts.PaneLayout;
-import forestry.core.gui.elements.layouts.VerticalLayout;
 import forestry.core.gui.widgets.IScrollable;
 
 public class EncyclopediaSpeciesList extends PaneLayout implements IScrollable {
@@ -28,32 +29,31 @@ public class EncyclopediaSpeciesList extends PaneLayout implements IScrollable {
 	/*Attributes - Gui Elements */
 	private final ScrollBarElement scrollBar;
 	private final ScrollableElement scrollable;
-	private final VerticalLayout scrollableContent;
+	private final ElementList<EncyclopediaEntry> scrollableContent;
 
 	public EncyclopediaSpeciesList() {
 		super(GuiEncyclopedia.PAGE_WIDTH, GuiEncyclopedia.PAGE_HEIGHT);
-
-		setLocation(GuiEncyclopedia.RIGHT_PAGE_START_X, GuiEncyclopedia.PAGE_START_Y);
 		//Background Texture
 		//drawable(32, 0, new Drawable(TEXTURE, 0, 0, 163, 166));
 		//Text Area
 		scrollable = new ScrollableElement(4, 0, 145, 150);
 		add(scrollable);
-		scrollableContent = new VerticalLayout(0, 0, 145);
+		scrollableContent = new ElementList<>(0, 0, 145, EncyclopediaEntryElement::new, null);
 		scrollable.add(scrollableContent);
 		scrollable.setContent(scrollableContent);
 		//Scrollbar
 		scrollBar = new ScrollBarElement(width - 10, 4, SCROLLBAR_BACKGROUND, false, SCROLLBAR_SLIDER);
 		scrollBar.setVisible(true);
 		add(scrollBar);
-		List<IAlleleSpecies> speciesList = new LinkedList<>();
+		List<EncyclopediaEntry> entries = new LinkedList<>();
 		for (IBee bee : BeeManager.beeRoot.getIndividualTemplates()) {
-			speciesList.add(bee.getGenome().getPrimary());
+			entries.add(new EncyclopediaEntry(bee.getGenome().getPrimary(), BeeManager.beeRoot.getBreedingTracker(Minecraft.getMinecraft().world, Minecraft.getMinecraft().player.getGameProfile())));
 		}
 		//speciesList.sort(Comparator.comparingInt(IAlleleSpecies::getComplexity));
-		for(IAlleleSpecies species : speciesList){
+		scrollableContent.setOptions(entries);
+		/*for(IAlleleSpecies species : speciesList){
 			scrollableContent.add(new EncyclopediaEntry(species));
-		}
+		}*/
 		int invisibleElements = scrollable.getInvisibleElementCount();
 		if (invisibleElements > 0) {
 			scrollBar.setParameters(this, 0, invisibleElements, 1);
