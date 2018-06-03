@@ -47,7 +47,7 @@ public class ButtonElement extends GuiElement {
 
 	@Override
 	public void drawElement(int mouseX, int mouseY) {
-		boolean mouseOver = isMouseOver(mouseX, mouseY);
+		boolean mouseOver = isMouseOver();
 		int hoverState = getHoverState(mouseOver);
 		Drawable drawable = textures[hoverState];
 		drawable.draw(0, 0);

@@ -22,7 +22,7 @@ public class ScrollableElement extends ElementGroup implements IScrollable {
 		});
 	}
 
-	public int getInvisibleElementCount() {
+	public int getInvisibleArea() {
 		step = (12 * 0.5F);
 		if(content == null){
 			return 0;

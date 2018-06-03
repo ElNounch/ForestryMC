@@ -10,21 +10,14 @@ import forestry.api.apiculture.BeeManager;
 import forestry.api.apiculture.IBee;
 import forestry.book.encyclopedia.EncyclopediaEntry;
 import forestry.book.gui.GuiEncyclopedia;
-import forestry.core.gui.Drawable;
 import forestry.core.gui.elements.ElementList;
-import forestry.core.gui.elements.GeneticAnalyzer;
 import forestry.core.gui.elements.ScrollBarElement;
 import forestry.core.gui.elements.ScrollableElement;
 import forestry.core.gui.elements.layouts.PaneLayout;
-import forestry.core.gui.widgets.IScrollable;
 
-public class EncyclopediaSpeciesList extends PaneLayout implements IScrollable {
+public class EncyclopediaSpeciesList extends PaneLayout {
 	/* Textures */
 	public static final ResourceLocation TEXTURE = GuiEncyclopedia.TEXTURE;
-
-	/* Drawables */
-	public static final Drawable SCROLLBAR_BACKGROUND = new Drawable(GeneticAnalyzer.TEXTURE, 202, 0, 3, 142);
-	public static final Drawable SCROLLBAR_SLIDER = new Drawable(GeneticAnalyzer.TEXTURE, 205, 0, 3, 5);
 
 	/*Attributes - Gui Elements */
 	private final ScrollBarElement scrollBar;
@@ -42,7 +35,7 @@ public class EncyclopediaSpeciesList extends PaneLayout implements IScrollable {
 		scrollable.add(scrollableContent);
 		scrollable.setContent(scrollableContent);
 		//Scrollbar
-		scrollBar = new ScrollBarElement(width - 10, 4, SCROLLBAR_BACKGROUND, false, SCROLLBAR_SLIDER);
+		scrollBar = new ScrollBarElement(width - 10, 4, GuiEncyclopedia.SCROLLBAR_BACKGROUND, false, GuiEncyclopedia.SCROLLBAR_SLIDER);
 		scrollBar.setVisible(true);
 		add(scrollBar);
 		List<EncyclopediaEntry> entries = new LinkedList<>();
@@ -54,23 +47,13 @@ public class EncyclopediaSpeciesList extends PaneLayout implements IScrollable {
 		/*for(IAlleleSpecies species : speciesList){
 			scrollableContent.add(new EncyclopediaEntry(species));
 		}*/
-		int invisibleElements = scrollable.getInvisibleElementCount();
-		if (invisibleElements > 0) {
-			scrollBar.setParameters(this, 0, invisibleElements, 1);
+		int invisibleArea = scrollable.getInvisibleArea();
+		if (invisibleArea > 0) {
+			scrollBar.setParameters(scrollable, 0, invisibleArea, 1);
 			scrollBar.setVisible(true);
 		} else {
 			scrollBar.setValue(0);
 			scrollBar.setVisible(false);
 		}
-	}
-
-	@Override
-	public void onScroll(int value) {
-		scrollable.onScroll(value);
-	}
-
-	@Override
-	public boolean isFocused(int mouseX, int mouseY) {
-		return isMouseOver();
 	}
 }

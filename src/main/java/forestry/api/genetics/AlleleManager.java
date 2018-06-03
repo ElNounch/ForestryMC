@@ -5,6 +5,8 @@
  ******************************************************************************/
 package forestry.api.genetics;
 
+import forestry.api.genetics.gadgets.IGadgetRegistry;
+
 /**
  * Holds a static reference to the {@link IAlleleRegistry}.
  */
@@ -28,4 +30,10 @@ public class AlleleManager {
 	 * @since 5.8
 	 */
 	public static IFilterRegistry filterRegistry;
+
+	/**
+	 * @since 5.8
+	 */
+	public static ISpeciesManager speciesManager;
+	public static IGadgetRegistry gadgetRegistry;
 }

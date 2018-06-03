@@ -45,7 +45,7 @@ public class GeneticAnalyzer extends ElementGroup implements IGeneticAnalyzer, I
 	/*Attributes - Gui Elements */
 	private final ScrollBarElement scrollBar;
 	private final ScrollableElement scrollable;
-	private final GeneticElement scrollableContent;
+	private final DatabaseElement scrollableContent;
 	private final GeneticAnalyzerTabs tabs;
 	private final IGuiElement itemElement;
 	private final ButtonElement leftButton;
@@ -65,7 +65,7 @@ public class GeneticAnalyzer extends ElementGroup implements IGeneticAnalyzer, I
 		//Text Area
 		scrollable = new ScrollableElement(32 + 10, 8, 145, 150);
 		add(scrollable);
-		scrollableContent = new GeneticElement(0, 0, 145);
+		scrollableContent = new DatabaseElement(145);
 		scrollable.setContent(scrollableContent);
 		scrollable.add(scrollableContent);
 		//Scrollbar
@@ -140,9 +140,9 @@ public class GeneticAnalyzer extends ElementGroup implements IGeneticAnalyzer, I
 						//Create the new elements
 						tab.createElements(scrollableContent, individual, stack);
 						//Update the scrollbar
-						int invisibleElements = scrollable.getInvisibleElementCount();
-						if (invisibleElements > 0) {
-							scrollBar.setParameters(this, 0, invisibleElements, 1);
+						int invisibleArea = scrollable.getInvisibleArea();
+						if (invisibleArea > 0) {
+							scrollBar.setParameters(this, 0, invisibleArea, 1);
 							scrollBar.setVisible(true);
 						} else {
 							scrollBar.setValue(0);

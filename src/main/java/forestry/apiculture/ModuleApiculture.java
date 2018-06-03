@@ -88,6 +88,7 @@ import forestry.apiculture.entities.EntityMinecartBeehouse;
 import forestry.apiculture.flowers.FlowerRegistry;
 import forestry.apiculture.genetics.BeeBranchDefinition;
 import forestry.apiculture.genetics.BeeDefinition;
+import forestry.apiculture.genetics.BeeEncyclopedia;
 import forestry.apiculture.genetics.BeeFactory;
 import forestry.apiculture.genetics.BeeMutationFactory;
 import forestry.apiculture.genetics.BeeRoot;
@@ -205,6 +206,7 @@ public class ModuleApiculture extends BlankForestryModule {
 		// Init bee interface
 		BeeManager.beeRoot = new BeeRoot();
 		AlleleManager.alleleRegistry.registerSpeciesRoot(BeeManager.beeRoot);
+		AlleleManager.speciesManager.registerEncyclopedia(BeeRoot.UID, new BeeEncyclopedia());
 
 		// Modes
 		BeeManager.beeRoot.registerBeekeepingMode(BeekeepingMode.easy);

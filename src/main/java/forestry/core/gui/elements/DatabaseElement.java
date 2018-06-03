@@ -7,14 +7,15 @@ import net.minecraft.client.gui.FontRenderer;
 
 import forestry.api.genetics.IAllele;
 import forestry.api.genetics.IAlleleInteger;
-import forestry.api.genetics.IAlleleSpecies;
 import forestry.api.genetics.IAlleleTolerance;
 import forestry.api.genetics.IBreedingTracker;
 import forestry.api.genetics.IChromosomeType;
 import forestry.api.genetics.IIndividual;
 import forestry.api.genetics.IMutation;
+import forestry.api.genetics.gadgets.DatabaseMode;
+import forestry.api.genetics.gadgets.IDatabasePage;
 import forestry.api.gui.GuiElementAlignment;
-import forestry.api.gui.IElementGenetic;
+import forestry.api.gui.IDatabaseElement;
 import forestry.api.gui.IElementGroup;
 import forestry.api.gui.IElementLayout;
 import forestry.api.gui.IGuiElement;
@@ -23,20 +24,42 @@ import forestry.core.gui.elements.layouts.PaneLayout;
 import forestry.core.gui.elements.layouts.VerticalLayout;
 import forestry.core.utils.Translator;
 
-public class GeneticElement extends VerticalLayout implements IElementGenetic{
-	public GeneticElement(int xPos, int yPos, int width) {
-		super(xPos, yPos, width);
+public class DatabaseElement extends VerticalLayout implements IDatabaseElement {
+	private final DatabaseMode mode;
+	private final IDatabasePage page;
+
+	public DatabaseElement(int width, IDatabasePage page) {
+		super(0, 0, width);
+		this.page = page;
+		this.mode = page.getMode();
 	}
 
 	@Override
-	public void addFertilityInfo(String chromosomeName, IAlleleInteger fertilityAllele, int texOffset) {
-		addRow(chromosomeName, GuiElementFactory.INSTANCE.createFertilityInfo(fertilityAllele, texOffset));
+	public DatabaseMode getMode() {
+		return mode;
 	}
 
 	@Override
-	public void addToleranceInfo(String chromosomeName, IAlleleTolerance toleranceAllele, IAlleleSpecies species, String text) {
-		addRow(chromosomeName, text, species.isDominant());
-		addRow("  " + Translator.translateToLocal("for.gui.tolerance"), GuiElementFactory.INSTANCE.createToleranceInfo(toleranceAllele));
+	public IDatabasePage getCurrentPage() {
+		return page;
+	}
+
+	@Override
+	public void addFertilityRow(String chromosomeName, IIndividual individual, IChromosomeType chromosome, int texOffset) {
+		IAllele allele = individual.getGenome().getActiveAllele(chromosome);
+		if(!(allele instanceof IAlleleInteger)){
+			return;
+		}
+		addRow(chromosomeName, GuiElementFactory.INSTANCE.createFertilityInfo((IAlleleInteger) allele, texOffset));
+	}
+
+	@Override
+	public void addToleranceRow(IIndividual individual, IChromosomeType chromosome) {
+		IAllele allele = individual.getGenome().getActiveAllele(chromosome);
+		if(!(allele instanceof IAlleleTolerance)){
+			return;
+		}
+		addRow("  " + Translator.translateToLocal("for.gui.tolerance"), GuiElementFactory.INSTANCE.createToleranceInfo((IAlleleTolerance) allele));
 	}
 
 	@Override
@@ -60,6 +83,13 @@ public class GeneticElement extends VerticalLayout implements IElementGenetic{
 	@Override
 	public void addRow(String firstText, String secondText, boolean dominant) {
 		addRow(firstText, secondText, GuiElementFactory.GUI_STYLE, GuiElementFactory.INSTANCE.getStateStyle(dominant));
+	}
+
+	@Override
+	public void addRow(String firstText, String secondText, String thirdText, IIndividual individual, IChromosomeType chromosome) {
+		addRow(firstText, secondText, thirdText, GuiElementFactory.GUI_STYLE,
+			GuiElementFactory.INSTANCE.getStateStyle(individual.getGenome().getActiveAllele(chromosome).isDominant()),
+			GuiElementFactory.INSTANCE.getStateStyle(individual.getGenome().getInactiveAllele(chromosome).isDominant()));
 	}
 
 	@Override

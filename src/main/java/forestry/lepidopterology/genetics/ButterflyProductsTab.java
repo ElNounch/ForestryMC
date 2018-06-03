@@ -9,7 +9,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import forestry.api.genetics.IDatabaseTab;
 import forestry.api.gui.GuiElementAlignment;
-import forestry.api.gui.IElementGenetic;
+import forestry.api.gui.IDatabaseElement;
 import forestry.api.gui.IElementLayoutHelper;
 import forestry.api.lepidopterology.EnumFlutterType;
 import forestry.api.lepidopterology.IButterfly;
@@ -23,7 +23,7 @@ public class ButterflyProductsTab implements IDatabaseTab<IButterfly> {
 	}
 
 	@Override
-	public void createElements(IElementGenetic container, IButterfly individual, ItemStack itemStack) {
+	public void createElements(IDatabaseElement container, IButterfly individual, ItemStack itemStack) {
 		IElementLayoutHelper groupHelper = container.layoutHelper((x, y) -> GuiElementFactory.INSTANCE.createHorizontal(x + 4, y, 18).setDistance(2), 90, 0);
 		Collection<ItemStack> butterflyLoot = individual.getGenome().getPrimary().getButterflyLoot().keySet();
 		if(!butterflyLoot.isEmpty()) {

@@ -14,18 +14,6 @@ public class ElementEvent extends GuiElementEvent {
 		}
 	}
 
-	public static class Show extends ElementEvent {
-		public Show(IGuiElement origin) {
-			super(origin);
-		}
-	}
-
-	public static class Hide extends ElementEvent {
-		public Hide(IGuiElement origin) {
-			super(origin);
-		}
-	}
-
 	public static class StartMouseOver extends ElementEvent {
 		public StartMouseOver(IGuiElement origin) {
 			super(origin);

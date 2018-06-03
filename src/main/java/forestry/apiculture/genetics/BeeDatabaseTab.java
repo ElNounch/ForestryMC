@@ -15,7 +15,7 @@ import forestry.api.genetics.IAlleleSpecies;
 import forestry.api.genetics.IAlleleTolerance;
 import forestry.api.genetics.IDatabaseTab;
 import forestry.api.gui.GuiElementAlignment;
-import forestry.api.gui.IElementGenetic;
+import forestry.api.gui.IDatabaseElement;
 import forestry.api.gui.style.ITextStyle;
 import forestry.api.gui.style.TextStyleBuilder;
 import forestry.api.lepidopterology.EnumButterflyChromosome;
@@ -36,7 +36,7 @@ public class BeeDatabaseTab implements IDatabaseTab<IBee> {
 	}
 
 	@Override
-	public void createElements(IElementGenetic container, IBee bee, ItemStack itemStack) {
+	public void createElements(IDatabaseElement container, IBee bee, ItemStack itemStack) {
 		EnumBeeType type = BeeManager.beeRoot.getType(itemStack);
 		if (type == null) {
 			return;
@@ -49,13 +49,11 @@ public class BeeDatabaseTab implements IDatabaseTab<IBee> {
 
 		IAlleleTolerance tempTolerance = (IAlleleTolerance) (active ? bee.getGenome().getActiveAllele(EnumBeeChromosome.TEMPERATURE_TOLERANCE) : bee.getGenome().getInactiveAllele(EnumBeeChromosome.TEMPERATURE_TOLERANCE));
 
-		//container.text(TextFormatting.UNDERLINE + Translator.translateToLocal("for.gui.climate"), GuiElementAlignment.CENTER);
-		container.addToleranceInfo(Translator.translateToLocal("for.gui.climate"), tempTolerance, primarySpecies, AlleleManager.climateHelper.toDisplay(primarySpecies.getTemperature()));
+		container.addToleranceRow(Translator.translateToLocal("for.gui.climate"), tempTolerance, primarySpecies, AlleleManager.climateHelper.toDisplay(primarySpecies.getTemperature()));
 
 		IAlleleTolerance humidTolerance = (IAlleleTolerance) (active ? bee.getGenome().getActiveAllele(EnumBeeChromosome.HUMIDITY_TOLERANCE) : bee.getGenome().getInactiveAllele(EnumBeeChromosome.HUMIDITY_TOLERANCE));
 
-		//container.text(TextFormatting.UNDERLINE + Translator.translateToLocal("for.gui.humidity"), GuiElementAlignment.CENTER);
-		container.addToleranceInfo(Translator.translateToLocal("for.gui.humidity"), humidTolerance, primarySpecies, AlleleManager.climateHelper.toDisplay(primarySpecies.getHumidity()));
+		container.addToleranceRow(Translator.translateToLocal("for.gui.humidity"), humidTolerance, primarySpecies, AlleleManager.climateHelper.toDisplay(primarySpecies.getHumidity()));
 
 		container.addAlleleRow(Translator.translateToLocal("for.gui.lifespan"), bee, EnumBeeChromosome.LIFESPAN, active);
 
@@ -64,7 +62,7 @@ public class BeeDatabaseTab implements IDatabaseTab<IBee> {
 		container.addAlleleRow(Translator.translateToLocal("for.gui.flowers"), bee, EnumBeeChromosome.FLOWER_PROVIDER, active);
 
 		IAlleleInteger primaryFertility = (IAlleleInteger) (active ? bee.getGenome().getActiveAllele(EnumBeeChromosome.FERTILITY) : bee.getGenome().getInactiveAllele(EnumBeeChromosome.FERTILITY));
-		container.addFertilityInfo(Translator.translateToLocal("for.gui.fertility"), primaryFertility, 0);
+		container.addFertilityRow(Translator.translateToLocal("for.gui.fertility"), primaryFertility, 0);
 
 		container.addAlleleRow(Translator.translateToLocal("for.gui.area"), bee, EnumBeeChromosome.TERRITORY, active);
 		container.addAlleleRow(Translator.translateToLocal("for.gui.effect"), bee, EnumBeeChromosome.EFFECT, active);
@@ -91,13 +89,7 @@ public class BeeDatabaseTab implements IDatabaseTab<IBee> {
 
 		container.addRow(Translator.translateToLocal("for.gui.diurnal"), diurnal, false);
 
-		//elementHelper.addText(TextFormatting.UNDERLINE + Translator.translateToLocal("for.gui.diurnal"), GuiElementAlignment.CENTER);
-		//elementHelper.addText(diurnal, GuiElementAlignment.CENTER, elementHelper.factory().getColorCoding(false));
-
 		container.addRow(Translator.translateToLocal("for.gui.nocturnal"), nocturnal, false);
-
-		//elementHelper.addText(TextFormatting.UNDERLINE + Translator.translateToLocal("for.gui.nocturnal"), GuiElementAlignment.CENTER);
-		//elementHelper.addText(nocturnal, GuiElementAlignment.CENTER, elementHelper.factory().getColorCoding(false));
 
 		String flyer = StringUtil.readableBoolean(active ? bee.getGenome().getToleratesRain() : ((AlleleBoolean) bee.getGenome().getInactiveAllele(EnumBeeChromosome.TOLERATES_RAIN)).getValue(), yes, no);
 		container.addAlleleRow(Translator.translateToLocal("for.gui.flyer"), (a) -> flyer, bee, EnumButterflyChromosome.TOLERANT_FLYER, active);

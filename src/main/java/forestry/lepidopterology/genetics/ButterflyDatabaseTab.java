@@ -11,7 +11,7 @@ import forestry.api.genetics.IAlleleTolerance;
 import forestry.api.genetics.IDatabaseTab;
 import forestry.api.gui.GuiConstants;
 import forestry.api.gui.GuiElementAlignment;
-import forestry.api.gui.IElementGenetic;
+import forestry.api.gui.IDatabaseElement;
 import forestry.api.lepidopterology.EnumButterflyChromosome;
 import forestry.api.lepidopterology.EnumFlutterType;
 import forestry.api.lepidopterology.IAlleleButterflySpecies;
@@ -31,7 +31,7 @@ public class ButterflyDatabaseTab implements IDatabaseTab<IButterfly> {
 	}
 
 	@Override
-	public void createElements(IElementGenetic container, IButterfly butterfly, ItemStack itemStack) {
+	public void createElements(IDatabaseElement container, IButterfly butterfly, ItemStack itemStack) {
 		IAlleleButterflySpecies primarySpecies = butterfly.getGenome().getPrimary();
 
 		container.label(Translator.translateToLocal("for.gui.database.tab." + (active ? "active" : "inactive") + "_species.name"), GuiElementAlignment.TOP_CENTER, GuiElementFactory.DATABASE_TITLE);
@@ -47,18 +47,18 @@ public class ButterflyDatabaseTab implements IDatabaseTab<IButterfly> {
 		container.addAlleleRow(Translator.translateToLocal("for.gui.metabolism"), (IAlleleInteger a)-> GenericRatings.rateMetabolism(a.getValue()), butterfly, EnumButterflyChromosome.METABOLISM, active);
 
 		IAlleleInteger fertility = (IAlleleInteger) (active ? butterfly.getGenome().getActiveAllele(EnumButterflyChromosome.FERTILITY) : butterfly.getGenome().getInactiveAllele(EnumButterflyChromosome.FERTILITY));
-		container.addFertilityInfo(Translator.translateToLocal("for.gui.fertility"), fertility, 8);
+		container.addFertilityRow(Translator.translateToLocal("for.gui.fertility"), fertility, 8);
 
 		container.addAlleleRow(Translator.translateToLocal("for.gui.flowers"), butterfly, EnumButterflyChromosome.FLOWER_PROVIDER, active);
 		container.addAlleleRow(Translator.translateToLocal("for.gui.effect"), butterfly, EnumButterflyChromosome.EFFECT, active);
 
 		IAlleleTolerance tempTolerance = (IAlleleTolerance) (active ? butterfly.getGenome().getActiveAllele(EnumButterflyChromosome.TEMPERATURE_TOLERANCE) : butterfly.getGenome().getInactiveAllele(EnumButterflyChromosome.TEMPERATURE_TOLERANCE));
 
-		container.addToleranceInfo(Translator.translateToLocal("for.gui.climate"), tempTolerance, primarySpecies, AlleleManager.climateHelper.toDisplay(primarySpecies.getTemperature()));
+		container.addToleranceRow(Translator.translateToLocal("for.gui.climate"), tempTolerance, primarySpecies, AlleleManager.climateHelper.toDisplay(primarySpecies.getTemperature()));
 
 		IAlleleTolerance humidTolerance = (IAlleleTolerance) (active ? butterfly.getGenome().getActiveAllele(EnumButterflyChromosome.HUMIDITY_TOLERANCE) : butterfly.getGenome().getInactiveAllele(EnumButterflyChromosome.HUMIDITY_TOLERANCE));
 
-		container.addToleranceInfo(Translator.translateToLocal("for.gui.humidity"), humidTolerance, primarySpecies, AlleleManager.climateHelper.toDisplay(primarySpecies.getHumidity()));
+		container.addToleranceRow(Translator.translateToLocal("for.gui.humidity"), humidTolerance, primarySpecies, AlleleManager.climateHelper.toDisplay(primarySpecies.getHumidity()));
 
 		String yes = Translator.translateToLocal("for.yes");
 		String no = Translator.translateToLocal("for.no");

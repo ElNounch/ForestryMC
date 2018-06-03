@@ -146,7 +146,7 @@ for.gui.database.mutations.further=Further Mutations
 for.gui.database.mutations.resultant=Resultant Mutations
 for.gui.database.support=This individual has currently no integration for the database.
 
-for.gui.encyclopedia.authority=Discovered by: %s
+for.gui.encyclopedia.authority=Discovered by:
 for.gui.encyclopedia.complexity=Complexity: %s
 
 for.gui.blank=Blank
@@ -1115,6 +1115,7 @@ tile.for.stump.name=Candle Stump
 # BOOK
 ####################
 item.for.book_forester.name=Forester's Manual
+item.for.encyclopedia.name=Forester's Encyclopedia
 
 for.gui.book.element.crafting=Crafting
 for.gui.book.about.title=About the book

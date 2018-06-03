@@ -1,5 +1,7 @@
 package forestry.core.gui.elements;
 
+import com.google.common.base.MoreObjects;
+
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -105,7 +107,7 @@ public class GuiElement extends Gui implements IGuiElement {
 	}
 
 	@Override
-	public void draw(int mouseX, int mouseY) {
+	public final void draw(int mouseX, int mouseY) {
 		if(!isVisible()){
 			return;
 		}
@@ -298,13 +300,11 @@ public class GuiElement extends Gui implements IGuiElement {
 	@Override
 	public void show() {
 		this.visible = true;
-		getWindow().postEvent(new ElementEvent.Show(this), GuiEventDestination.ALL);
 	}
 
 	@Override
 	public void hide() {
 		this.visible = false;
-		getWindow().postEvent(new ElementEvent.Hide(this), GuiEventDestination.ALL);
 	}
 
 	@Override
@@ -368,5 +368,19 @@ public class GuiElement extends Gui implements IGuiElement {
 		for(Consumer<? extends GuiElementEvent> eventHandler : eventHandlers){
 			((Consumer<GuiElementEvent>)eventHandler).accept(event);
 		}
+	}
+
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(this)
+			.add("x", getX())
+			.add("y", getY())
+			.add("w", width)
+			.add("h", height)
+			.add("a", align)
+			.add("v", isVisible())
+			.add("xO", xOffset)
+			.add("yO", yOffset)
+			.toString();
 	}
 }

@@ -21,7 +21,7 @@ import forestry.api.genetics.IDatabaseTab;
 import forestry.api.genetics.IFruitFamily;
 import forestry.api.gui.GuiConstants;
 import forestry.api.gui.GuiElementAlignment;
-import forestry.api.gui.IElementGenetic;
+import forestry.api.gui.IDatabaseElement;
 import forestry.api.gui.style.ITextStyle;
 import forestry.arboriculture.genetics.alleles.AlleleFruits;
 import forestry.core.gui.elements.GuiElementFactory;
@@ -36,7 +36,7 @@ public class TreeDatabaseTab implements IDatabaseTab<ITree> {
 	}
 
 	@Override
-	public void createElements(IElementGenetic container, ITree tree, ItemStack itemStack) {
+	public void createElements(IDatabaseElement container, ITree tree, ItemStack itemStack) {
 		IAlleleTreeSpecies primarySpecies = tree.getGenome().getPrimary();
 		IAlleleTreeSpecies species = active ? primarySpecies : tree.getGenome().getSecondary();
 		ITextStyle speciesStyle = GuiElementFactory.INSTANCE.getStateStyle(species.isDominant());

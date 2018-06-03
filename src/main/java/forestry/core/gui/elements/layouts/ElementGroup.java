@@ -139,12 +139,12 @@ public abstract class ElementGroup extends GuiElement implements IElementGroup {
 
 	@Override
 	public ITextElement splitText(String text, int width, GuiElementAlignment align, ITextStyle textStyle) {
-		return splitText(text, 0, 0, width, GuiElementAlignment.TOP_LEFT, textStyle);
+		return splitText(text, 0, 0, width, align, textStyle);
 	}
 
 	@Override
 	public ITextElement splitText(String text, int x, int y, int width, GuiElementAlignment align, ITextStyle textStyle) {
-		return new SplitTextElement(x, y, width, text, align, textStyle);
+		return add(new SplitTextElement(x, y, width, text, align, textStyle));
 	}
 
 	@Override

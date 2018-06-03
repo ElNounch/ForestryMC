@@ -16,7 +16,7 @@ import forestry.api.genetics.IMutation;
 import forestry.api.genetics.ISpeciesRoot;
 import forestry.api.gui.GuiConstants;
 import forestry.api.gui.GuiElementAlignment;
-import forestry.api.gui.IElementGenetic;
+import forestry.api.gui.IDatabaseElement;
 import forestry.api.gui.IElementLayoutHelper;
 import forestry.core.gui.elements.GuiElementFactory;
 import forestry.core.utils.Translator;
@@ -27,7 +27,7 @@ public class MutationsTab extends DatabaseTab {
 	}
 
 	@Override
-	public void createElements(IElementGenetic container, IIndividual individual, ItemStack itemStack) {
+	public void createElements(IDatabaseElement container, IIndividual individual, ItemStack itemStack) {
 		IGenome genome = individual.getGenome();
 		ISpeciesRoot speciesRoot = genome.getSpeciesRoot();
 		IAlleleSpecies species = genome.getPrimary();
