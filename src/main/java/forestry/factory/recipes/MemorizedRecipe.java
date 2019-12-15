@@ -38,9 +38,9 @@ public final class MemorizedRecipe implements INBTTagable, IStreamable {
 		// required for IStreamable serialization
 	}
 
-	public MemorizedRecipe(InventoryCraftingForestry craftMatrix, List<ItemStack> recipeOutputs) {
+	public MemorizedRecipe(InventoryCraftingForestry craftMatrix, ItemStack recipeOutputs) {
 		InventoryUtil.deepCopyInventoryContents(craftMatrix, this.craftMatrix);
-		this.recipeOutputs.addAll(recipeOutputs);
+		this.recipeOutputs.add(recipeOutputs);
 	}
 
 	public InventoryCraftingForestry getCraftMatrix() {
@@ -49,8 +49,8 @@ public final class MemorizedRecipe implements INBTTagable, IStreamable {
 
 	public void calculateRecipeOutput(World world) {
 		recipeOutputs.clear();
-		List<ItemStack> matching = RecipeUtil.findMatchingRecipes(craftMatrix, world);
-		recipeOutputs.addAll(matching);
+		ItemStack matching = RecipeUtil.findMatchingRecipes(craftMatrix, world);
+		recipeOutputs.add(matching);
 		if (selectedRecipe >= recipeOutputs.size()) {
 			selectedRecipe = 0;
 		}

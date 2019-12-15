@@ -141,33 +141,15 @@ public abstract class RecipeUtil {
 			}
 		}
 
-		List<ItemStack> outputs = findMatchingRecipes(crafting, world);
-		if (!ItemStackUtil.containsItemStack(outputs, recipeOutput)) {
+		ItemStack output = findMatchingRecipes(crafting, world);
+		if (!ItemStackUtil.isIdenticalItem(output, recipeOutput)) {
 			return null;
 		}
 		return crafting;
 	}
 
-	public static List<ItemStack> findMatchingRecipes(InventoryCrafting inventory, World world) {
-		ItemStack repairRecipe = findRepairRecipe(inventory);
-		if (repairRecipe != null) {
-			return Collections.singletonList(repairRecipe);
-		}
-
-		List<ItemStack> matchingRecipes = new ArrayList<>();
-
-		for (Object recipe : CraftingManager.getInstance().getRecipeList()) {
-			IRecipe irecipe = (IRecipe) recipe;
-
-			if (irecipe.matches(inventory, world)) {
-				ItemStack result = irecipe.getCraftingResult(inventory);
-				if (!ItemStackUtil.containsItemStack(matchingRecipes, result)) {
-					matchingRecipes.add(result);
-				}
-			}
-		}
-
-		return matchingRecipes;
+	public static ItemStack findMatchingRecipes(InventoryCrafting inventory, World world) {
+		return CraftingManager.getInstance().findMatchingRecipe(inventory,world);
 	}
 
 	private static ItemStack findRepairRecipe(InventoryCrafting inventory) {
